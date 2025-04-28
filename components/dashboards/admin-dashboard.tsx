@@ -94,8 +94,17 @@ export function AdminDashboard({ user, semesters }: AdminDashboardProps) {
   const [selectedSemester, setSelectedSemester] = useState<SemesterResponse | null>(null)
   const [selectedUserForGroup, setSelectedUserForGroup] = useState<UserResponse | null>(null)
 
+  interface newUserForm{
+    name: string,
+    surname: string,
+    patronymic: string,
+    phone: string,
+    login: string,
+    password: string,
+    role: "student" | "observer" | "accountant" | "admin";
+  }
   // Формы
-  const [newUserForm, setNewUserForm] = useState({
+  const [newUserForm, setNewUserForm] = useState<newUserForm>({
     name: "",
     surname: "",
     patronymic: "",
@@ -585,7 +594,7 @@ export function AdminDashboard({ user, semesters }: AdminDashboardProps) {
   }
 
   // Функция для получения названия роли
-  const getRoleName = (role: string) => {
+  const getRoleName = (role: "student" | "observer" | "accountant" | "admin") => {
     switch (role) {
       case "student":
         return "Студент"
@@ -1120,7 +1129,7 @@ export function AdminDashboard({ user, semesters }: AdminDashboardProps) {
               <Label htmlFor="role">Роль</Label>
               <Select
                 value={newUserForm.role}
-                onValueChange={(value) => setNewUserForm({ ...newUserForm, role: value })}
+                onValueChange={(value: "student" | "observer" | "accountant" | "admin") => setNewUserForm({ ...newUserForm, role: value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Выберите роль" />

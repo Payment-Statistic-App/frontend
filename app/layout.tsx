@@ -10,7 +10,6 @@ const inter = Inter({ subsets: ["latin", "cyrillic"] })
 export const metadata = {
   title: "Система учета оплаты обучения",
   description: "Система для отслеживания оплаты обучения студентами",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({

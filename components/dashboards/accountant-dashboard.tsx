@@ -287,7 +287,7 @@ export function AccountantDashboard({ user, semesters }: AccountantDashboardProp
   const SEMESTERS_PER_COLUMN = Math.ceil(semesters.length / MAX_COLUMNS)
 
   // Разбиваем семестры на группы
-  const semesterGroups = []
+  const semesterGroups = [] as SemesterResponse[][]
   for (let i = 0; i < semesters.length; i += SEMESTERS_PER_COLUMN) {
     semesterGroups.push(semesters.slice(i, i + SEMESTERS_PER_COLUMN))
   }
