@@ -7,6 +7,10 @@
 /.next/
 /out/
 
+# IDE
+.idea/
+.vscode/
+
 # production
 /build
 
