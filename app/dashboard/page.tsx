@@ -4,7 +4,7 @@ import { getUserSelf } from "@/lib/api/users"
 import { DashboardContent } from "@/components/dashboard-content"
 
 export default async function DashboardPage() {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const token = cookieStore.get("token")
 
   if (!token) {
@@ -20,7 +20,7 @@ export default async function DashboardPage() {
       </main>
     )
   } catch (error) {
-    cookies().delete("token")
+    cookieStore.delete("token")
     redirect("/")
   }
 }

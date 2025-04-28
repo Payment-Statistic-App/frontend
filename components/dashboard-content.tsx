@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import type { UserResponse } from "@/lib/types"
+import type { SemesterResponse, UserResponse } from "@/lib/types"
 import { StudentDashboard } from "@/components/dashboards/student-dashboard"
 import { ObserverDashboard } from "@/components/dashboards/observer-dashboard"
 import { AccountantDashboard } from "@/components/dashboards/accountant-dashboard"
@@ -14,7 +14,7 @@ interface DashboardContentProps {
 }
 
 export function DashboardContent({ user }: DashboardContentProps) {
-  const [semesters, setSemesters] = useState([])
+  const [semesters, setSemesters] = useState<SemesterResponse[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
