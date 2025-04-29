@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createTransaction } from "@/lib/api/operations"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 import { Loader2, CreditCard, Calendar, Lock } from "lucide-react"
 
 interface PaymentDialogProps {

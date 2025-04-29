@@ -32,7 +32,7 @@ import {
 import { addStudentToGroup, removeStudentFromGroup } from "@/lib/api/operations"
 import { createUser, editUser, deleteUser } from "@/lib/api/users"
 import { getOperations, operationTypeNames, getOperationTypeInfo } from "@/lib/api/activity"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 import {
   Loader2,
   Plus,
