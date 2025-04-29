@@ -30,53 +30,50 @@ export function formatDateTime(dateString: string): string {
   }).format(adjustedDate)
 }
 
-// Форматирование номера телефона
+// Форматирование номера телефона - улучшенная версия
 export function formatPhoneNumber(value: string): string {
   // Удаляем все нецифровые символы
   const digits = value.replace(/\D/g, "")
 
-  // Если номер начинается с 7 или 8, оставляем только 8
-  let formattedNumber = digits
-  if (digits.startsWith("7") || digits.startsWith("8")) {
-    formattedNumber = "8" + digits.substring(1)
-  } else if (digits.length > 0 && !digits.startsWith("8")) {
+  // Если пустая строка, возвращаем пустую строку
+  if (!digits) return ""
+
+  // Ограничиваем до 11 цифр
+  const limitedDigits = digits.substring(0, 11)
+
+  // Если номер начинается с 7 или 8, заменяем на 8
+  let formattedNumber = limitedDigits
+  if (formattedNumber.startsWith("7") || formattedNumber.startsWith("8")) {
+    formattedNumber = "8" + formattedNumber.substring(1)
+  } else if (formattedNumber.length > 0) {
     // Если номер не начинается с 8, добавляем 8 в начало
-    formattedNumber = "8" + digits
+    formattedNumber = "8" + formattedNumber
   }
+
+  // Ограничиваем до 11 цифр снова после возможного добавления 8
+  formattedNumber = formattedNumber.substring(0, 11)
 
   // Форматируем номер в виде 8 (XXX) XXX-XX-XX
-  if (formattedNumber.length > 0) {
-    formattedNumber = formattedNumber.substring(0, 11) // Ограничиваем до 11 цифр
-
-    // Форматируем номер
-    if (formattedNumber.length > 1) {
-      formattedNumber = "8" + formattedNumber.substring(1)
-    }
-    if (formattedNumber.length > 1) {
-      formattedNumber = formattedNumber.substring(0, 1) + " " + formattedNumber.substring(1)
-    }
-    if (formattedNumber.length > 4) {
-      formattedNumber =
-        formattedNumber.substring(0, 2) + "(" + formattedNumber.substring(2, 5) + ")" + formattedNumber.substring(5)
-    }
-    if (formattedNumber.length > 9) {
-      formattedNumber = formattedNumber.substring(0, 9) + "-" + formattedNumber.substring(9)
-    }
-    if (formattedNumber.length > 12) {
-      formattedNumber = formattedNumber.substring(0, 12) + "-" + formattedNumber.substring(12)
-    }
+  if (formattedNumber.length <= 1) {
+    return formattedNumber
+  } else if (formattedNumber.length <= 4) {
+    return `${formattedNumber.substring(0, 1)} (${formattedNumber.substring(1)}`
+  } else if (formattedNumber.length <= 7) {
+    return `${formattedNumber.substring(0, 1)} (${formattedNumber.substring(1, 4)}) ${formattedNumber.substring(4)}`
+  } else if (formattedNumber.length <= 9) {
+    return `${formattedNumber.substring(0, 1)} (${formattedNumber.substring(1, 4)}) ${formattedNumber.substring(4, 7)}-${formattedNumber.substring(7)}`
+  } else {
+    return `${formattedNumber.substring(0, 1)} (${formattedNumber.substring(1, 4)}) ${formattedNumber.substring(4, 7)}-${formattedNumber.substring(7, 9)}-${formattedNumber.substring(9, 11)}`
   }
-
-  return formattedNumber
 }
 
-// Валидация номера телефона
+// Валидация номера телефона - улучшенная версия
 export function isValidPhoneNumber(value: string): boolean {
   // Удаляем все нецифровые символы
   const digits = value.replace(/\D/g, "")
 
-  // Проверяем, что номер начинается с 8 и содержит 11 цифр
-  return digits.startsWith("8") && digits.length === 11
+  // Проверяем, что номер содержит 11 цифр и начинается с 8
+  return digits.length === 11 && (digits.startsWith("8") || digits.startsWith("7"))
 }
 
 export function cn(...inputs: ClassValue[]) {
