@@ -94,6 +94,27 @@ export function AdminDashboard({ user, semesters }: AdminDashboardProps) {
   const [selectedSemester, setSelectedSemester] = useState<SemesterResponse | null>(null)
   const [selectedUserForGroup, setSelectedUserForGroup] = useState<UserResponse | null>(null)
 
+  const formatPhoneNumber = (input: string): { formatted: string; complete: boolean } => {
+    // Удаляем все нецифровые символы
+    const cleaned = input.replace(/\D/g, '')
+    
+    // Ограничиваем длину номера (11 цифр для России)
+    const match = cleaned.match(/^(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,3})$/)
+    
+    if (!match) return { formatted: input, complete: false }
+    
+    let formatted = ''
+    if (match[1]) formatted += `8 (${match[2]}`
+    if (match[3]) formatted += `) ${match[3]}`
+    if (match[4]) formatted += `-${match[4]}`
+    if (match[5]) formatted += `-${match[5]}`
+  
+    // Проверяем, полностью ли заполнен номер
+    const complete = cleaned.length === 12
+  
+    return { formatted, complete }
+  }
+
   interface newUserForm{
     name: string,
     surname: string,
@@ -165,17 +186,25 @@ export function AdminDashboard({ user, semesters }: AdminDashboardProps) {
     fetchData()
   }, [toast])
 
+
+  const isValidPhoneNumber = (phone: string): boolean => {
+    return phone.length === 17 // Длина полного формата "8 (999) 123-45-67"
+  }
+
   // Обработчик изменения номера телефона с форматированием
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, formSetter: Function, form: any) => {
-    const formattedPhone = formatPhoneNumber(e.target.value)
-    formSetter({ ...form, phone: formattedPhone })
-
-    // Валидация номера телефона
-    if (formattedPhone && !isValidPhoneNumber(formattedPhone)) {
-      setPhoneError("Введите корректный номер телефона")
-    } else {
-      setPhoneError("")
+    const rawValue = e.target.value
+    const { formatted, complete } = formatPhoneNumber(rawValue)
+    
+    // Если номер уже полный, не обновляем значение
+    if (complete && rawValue.length > form.phone.length) {
+      return
     }
+  
+    formSetter({ ...form, phone: formatted })
+  
+    // Валидация
+    //setPhoneError(complete ? "" : "Введите корректный номер телефона")
   }
 
   // Обработчик изменения пароля с валидацией
@@ -1089,6 +1118,7 @@ export function AdminDashboard({ user, semesters }: AdminDashboardProps) {
             <div className="space-y-2">
               <Label htmlFor="patronymic">Отчество</Label>
               <Input
+                maxLength={17}
                 id="patronymic"
                 placeholder="Иванович"
                 value={newUserForm.patronymic}
@@ -1102,6 +1132,14 @@ export function AdminDashboard({ user, semesters }: AdminDashboardProps) {
                 placeholder="8 (999) 123-45-67"
                 value={newUserForm.phone}
                 onChange={(e) => handlePhoneChange(e, setNewUserForm, newUserForm)}
+                onKeyDown={(e) => {
+                  // Если номер уже полный и это не управляющая клавиша - блокируем ввод
+                  if (isValidPhoneNumber(newUserForm.phone) && 
+                      !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
+                maxLength={20} // Фиксированная длина полного номера
               />
               {phoneError && <p className="text-sm text-red-500">{phoneError}</p>}
             </div>
@@ -1193,8 +1231,16 @@ export function AdminDashboard({ user, semesters }: AdminDashboardProps) {
               <Input
                 id="edit-phone"
                 placeholder="8 (999) 123-45-67"
-                value={editUserForm.phone}
                 onChange={(e) => handlePhoneChange(e, setEditUserForm, editUserForm)}
+                onKeyDown={(e) => {
+                  // Если номер уже полный и это не управляющая клавиша - блокируем ввод
+                  if (isValidPhoneNumber(newUserForm.phone) && 
+                      !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+                    e.preventDefault()
+                  }
+                }}
+                maxLength={20} // Фиксированная длина полного номера
+                value={editUserForm.phone}
               />
               {phoneError && <p className="text-sm text-red-500">{phoneError}</p>}
             </div>
