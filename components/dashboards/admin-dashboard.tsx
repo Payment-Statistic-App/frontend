@@ -961,11 +961,11 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                     <SelectValue placeholder="Все типы" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">Все типы</SelectItem>
-                                    {Object.keys(operationTypeNames).map((type) => (
-                                        <SelectItem key={type} value={type}>
-                                        </SelectItem>
-                                    ))}
+                                    <SelectItem value="all">Все действия</SelectItem>
+                                    <SelectItem value="payment">Оплаты</SelectItem>
+                                    <SelectItem value="user">Пользователи</SelectItem>
+                                    <SelectItem value="group">Группы</SelectItem>
+                                    <SelectItem value="semester">Семестры</SelectItem>
                                 </SelectContent>
                             </Select>
                             <Select value={dateFilter} onValueChange={setDateFilter}>
