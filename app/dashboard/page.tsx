@@ -13,14 +13,13 @@ export default async function DashboardPage() {
 
   try {
     const user = await getUserSelf(token.value)
-
     return (
       <main className="min-h-screen bg-gray-50">
         <DashboardContent user={user} />
       </main>
     )
   } catch (error) {
-    cookieStore.delete("token")
-    redirect("/")
+    // Instead of modifying cookies here, redirect to a route handler
+    redirect("/api/auth/signout")
   }
 }

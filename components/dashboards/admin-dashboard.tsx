@@ -824,8 +824,8 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                             <table className="w-full text-sm">
                                 <thead className="[&amp;:not([align=left])]:text-left">
                                 <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                    <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Название</th>
-                                    <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Действия</th>
+                                    <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Название</th>
+                                    <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground pl-7">Действия</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -897,8 +897,8 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                             <table className="w-full text-sm">
                                 <thead className="[&amp;:not([align=left])]:text-left">
                                 <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                    <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Название</th>
-                                    <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Действия</th>
+                                    <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Название</th>
+                                    <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground pl-7">Действия</th>
                                 </tr>
                                 </thead>
                                 <tbody>
