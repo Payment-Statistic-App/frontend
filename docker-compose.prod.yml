@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+
+  # -------------------------
+  # FRONTEND
+  # -------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: payment-frontend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.payment-frontend.rule=Host(`energy-cerber.ru`)"
+      - "traefik.http.routers.payment-frontend.entrypoints=websecure"
+      - "traefik.http.routers.payment-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.payment-frontend.loadbalancer.server.port=3000"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    external: true
+    name: vps-network
