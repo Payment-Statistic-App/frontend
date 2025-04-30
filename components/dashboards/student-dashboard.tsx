@@ -9,6 +9,8 @@ import { PaymentDialog } from "@/components/payment-dialog"
 import { ReceiptDialog } from "@/components/receipt-dialog"
 import { formatDate } from "@/lib/utils"
 import { Pagination } from "@/components/pagination"
+// Импортируем компонент Tabs
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface StudentDashboardProps {
   user: UserResponse
@@ -101,124 +103,135 @@ export function StudentDashboard({ user, semesters }: StudentDashboardProps) {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Оплата семестров</CardTitle>
-            <CardDescription>Статус оплаты по семестрам</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <div className="rounded-md border min-w-[600px] w-full">
-                <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted">
-                  <div className="col-span-4">Семестр</div>
-                  <div className="col-span-3 text-center">Статус</div>
-                  <div className="col-span-5 text-right">Действия</div>
-                </div>
-                <div className="divide-y">
-                  {paginatedSemesters.map((semester) => {
-                    const isPaid = isSemesterPaid(semester.id)
-                    const transaction = getTransactionBySemester(semester.id)
+        <Tabs defaultValue="semesters" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="semesters">Оплата семестров</TabsTrigger>
+            <TabsTrigger value="history">История платежей</TabsTrigger>
+          </TabsList>
 
-                    return (
-                        <div key={semester.id} className="grid grid-cols-12 p-4 text-sm items-center">
-                          <div className="col-span-4">{semester.name}</div>
-                          <div className="col-span-3 text-center">
-                            {isPaid ? (
-                                <Badge variant="success" className="bg-green-100 text-green-800 hover:bg-green-100">
-                                  Оплачено
-                                </Badge>
-                            ) : (
-                                <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-100">
-                                  Не оплачено
-                                </Badge>
-                            )}
-                          </div>
-                          <div className="col-span-5 text-right space-x-2">
-                            {isPaid ? (
-                                <Button variant="outline" size="sm" onClick={() => handleReceiptClick(semester)}>
-                                  <span className="hidden sm:inline">Справка об оплате</span>
-                                  <span className="sm:hidden">Справка</span>
+          <TabsContent value="semesters" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Оплата семестров</CardTitle>
+                <CardDescription>Статус оплаты по семестрам</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <div className="rounded-md border min-w-[600px] w-full">
+                    <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted">
+                      <div className="col-span-4">Семестр</div>
+                      <div className="col-span-3 text-center">Статус</div>
+                      <div className="col-span-5 text-right">Действия</div>
+                    </div>
+                    <div className="divide-y">
+                      {paginatedSemesters.map((semester) => {
+                        const isPaid = isSemesterPaid(semester.id)
+                        const transaction = getTransactionBySemester(semester.id)
+
+                        return (
+                            <div key={semester.id} className="grid grid-cols-12 p-4 text-sm items-center">
+                              <div className="col-span-4">{semester.name}</div>
+                              <div className="col-span-3 text-center">
+                                {isPaid ? (
+                                    <Badge variant="success" className="bg-green-100 text-green-800 hover:bg-green-100">
+                                      Оплачено
+                                    </Badge>
+                                ) : (
+                                    <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-100">
+                                      Не оплачено
+                                    </Badge>
+                                )}
+                              </div>
+                              <div className="col-span-5 text-right space-x-2">
+                                {isPaid ? (
+                                    <Button variant="outline" size="sm" onClick={() => handleReceiptClick(semester)}>
+                                      <span className="hidden sm:inline">Справка об оплате</span>
+                                      <span className="sm:hidden">Справка</span>
+                                    </Button>
+                                ) : (
+                                    <Button variant="default" size="sm" onClick={() => handlePayClick(semester)}>
+                                      Оплатить
+                                    </Button>
+                                )}
+                              </div>
+                            </div>
+                        )
+                      })}
+
+                      {semesters.length === 0 && (
+                          <div className="p-4 text-center text-muted-foreground">Нет доступных семестров для оплаты</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {totalSemestersPages > 1 && (
+                    <Pagination
+                        currentPage={currentSemestersPage}
+                        totalPages={totalSemestersPages}
+                        onPageChange={setCurrentSemestersPage}
+                    />
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="history" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>История платежей</CardTitle>
+                <CardDescription>Ваши платежи за обучение</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <div className="rounded-md border min-w-[600px] w-full">
+                    <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted">
+                      <div className="col-span-4">Семестр</div>
+                      <div className="col-span-3">Сумма</div>
+                      <div className="col-span-3">Дата</div>
+                      <div className="col-span-2 text-right">Действия</div>
+                    </div>
+                    <div className="divide-y">
+                      {paginatedTransactions.map((transaction) => {
+                        const semester = semesters.find((s) => s.id === transaction.semester_id)
+
+                        return (
+                            <div key={transaction.id} className="grid grid-cols-12 p-4 text-sm items-center">
+                              <div className="col-span-4">{semester ? semester.name : transaction.semester_id}</div>
+                              <div className="col-span-3">{transaction.amount} ₽</div>
+                              <div className="col-span-3">{formatDate(transaction.created_at)}</div>
+                              <div className="col-span-2 text-right">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      setSelectedTransaction(transaction)
+                                      setIsReceiptOpen(true)
+                                    }}
+                                >
+                                  Справка
                                 </Button>
-                            ) : (
-                                <Button variant="default" size="sm" onClick={() => handlePayClick(semester)}>
-                                  Оплатить
-                                </Button>
-                            )}
-                          </div>
-                        </div>
-                    )
-                  })}
+                              </div>
+                            </div>
+                        )
+                      })}
 
-                  {semesters.length === 0 && (
-                      <div className="p-4 text-center text-muted-foreground">Нет доступных семестров для оплаты</div>
-                  )}
+                      {user.transactions.length === 0 && (
+                          <div className="p-4 text-center text-muted-foreground">У вас пока нет платежей</div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            {totalSemestersPages > 1 && (
-                <Pagination
-                    currentPage={currentSemestersPage}
-                    totalPages={totalSemestersPages}
-                    onPageChange={setCurrentSemestersPage}
-                />
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>История платежей</CardTitle>
-            <CardDescription>Ваши платежи за обучение</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <div className="rounded-md border min-w-[600px] w-full">
-                <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted">
-                  <div className="col-span-4">Семестр</div>
-                  <div className="col-span-3">Сумма</div>
-                  <div className="col-span-3">Дата</div>
-                  <div className="col-span-2 text-right">Действия</div>
-                </div>
-                <div className="divide-y">
-                  {paginatedTransactions.map((transaction) => {
-                    const semester = semesters.find((s) => s.id === transaction.semester_id)
-
-                    return (
-                        <div key={transaction.id} className="grid grid-cols-12 p-4 text-sm items-center">
-                          <div className="col-span-4">{semester ? semester.name : transaction.semester_id}</div>
-                          <div className="col-span-3">{transaction.amount} ₽</div>
-                          <div className="col-span-3">{formatDate(transaction.created_at)}</div>
-                          <div className="col-span-2 text-right">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setSelectedTransaction(transaction)
-                                  setIsReceiptOpen(true)
-                                }}
-                            >
-                              Справка
-                            </Button>
-                          </div>
-                        </div>
-                    )
-                  })}
-
-                  {user.transactions.length === 0 && (
-                      <div className="p-4 text-center text-muted-foreground">У вас пока нет платежей</div>
-                  )}
-                </div>
-              </div>
-            </div>
-            {totalTransactionsPages > 1 && (
-                <Pagination
-                    currentPage={currentTransactionsPage}
-                    totalPages={totalTransactionsPages}
-                    onPageChange={setCurrentTransactionsPage}
-                />
-            )}
-          </CardContent>
-        </Card>
+                {totalTransactionsPages > 1 && (
+                    <Pagination
+                        currentPage={currentTransactionsPage}
+                        totalPages={totalTransactionsPages}
+                        onPageChange={setCurrentTransactionsPage}
+                    />
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {selectedSemester && (
             <PaymentDialog open={isPaymentOpen} onOpenChange={setIsPaymentOpen} user={user} semester={selectedSemester} />
