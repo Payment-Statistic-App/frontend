@@ -5,7 +5,7 @@ import type { UserResponse, SemesterResponse } from "@/lib/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { getStudents } from "@/lib/api/users"
-import { FileText, Printer, Download, Loader2 } from "lucide-react"
+import { Download, Printer, FileText, Loader2, FileSpreadsheet } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import * as XLSX from "xlsx"
+import { toast } from "@/components/ui/use-toast"
+import { formatStudentsForExcel, formatSemesterStatsForExcel } from "@/lib/excel-utils"
 
 interface ObserverDashboardProps {
   user: UserResponse
@@ -233,17 +236,79 @@ export function ObserverDashboard({ user, semesters }: ObserverDashboardProps) {
     }
   })
 
+  // Добавим функцию для экспорта в Excel
+  const handleExportToExcel = () => {
+    try {
+      // Форматируем данные студентов для Excel
+      const studentsData = formatStudentsForExcel(students, semesters)
+
+      // Форматируем статистику по семестрам для Excel
+      const semesterStatsData = formatSemesterStatsForExcel(students, semesters)
+
+      // Создаем и скачиваем Excel файл
+      const workbook = XLSX.utils.book_new()
+
+      // Лист со студентами
+      const studentsWorksheet = XLSX.utils.json_to_sheet(studentsData)
+      XLSX.utils.book_append_sheet(workbook, studentsWorksheet, "Студенты")
+
+      // Лист со статистикой по семестрам
+      const statsWorksheet = XLSX.utils.json_to_sheet(semesterStatsData)
+      XLSX.utils.book_append_sheet(workbook, statsWorksheet, "Статистика по семестрам")
+
+      // Создаем бинарные данные в формате xlsx
+      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" })
+
+      // Создаем Blob из бинарных данных
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      })
+
+      // Создаем URL для Blob
+      const url = URL.createObjectURL(blob)
+
+      // Создаем ссылку для скачивания
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `Сводный_отчет_${new Date().toLocaleDateString()}.xlsx`
+
+      // Добавляем ссылку в DOM, кликаем по ней и удаляем
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+
+      // Освобождаем URL
+      URL.revokeObjectURL(url)
+
+      toast({
+        title: "Успешно",
+        description: "Отчет успешно экспортирован в Excel",
+      })
+    } catch (error) {
+      console.error("Ошибка при экспорте в Excel:", error)
+      toast({
+        title: "Ошибка",
+        description: "Не удалось экспортировать отчет в Excel",
+        variant: "destructive",
+      })
+    }
+  }
+
   return (
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Панель наблюдателя</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Панель директора</h1>
             <p className="text-muted-foreground">Просмотр отчетов по оплате обучения студентами</p>
           </div>
-          <div className="mt-4 md:mt-0">
+          <div className="mt-4 md:mt-0 flex gap-2">
             <Button onClick={() => setIsReportOpen(true)}>
               <FileText className="mr-2 h-4 w-4" />
               Сводный отчет
+            </Button>
+            <Button variant="outline" onClick={handleExportToExcel}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" />
+              Экспорт в Excel
             </Button>
           </div>
         </div>
@@ -398,9 +463,13 @@ export function ObserverDashboard({ user, semesters }: ObserverDashboardProps) {
                 <Printer className="mr-2 h-4 w-4" />
                 Печать
               </Button>
+              <Button variant="outline" onClick={handleExportToExcel} className="w-full sm:w-auto">
+                <FileSpreadsheet className="mr-2 h-4 w-4" />
+                Экспорт в Excel
+              </Button>
               <Button onClick={handleDownloadReport} className="w-full sm:w-auto">
                 <Download className="mr-2 h-4 w-4" />
-                Скачать
+                Скачать HTML
               </Button>
             </DialogFooter>
           </DialogContent>

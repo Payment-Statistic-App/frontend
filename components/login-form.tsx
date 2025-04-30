@@ -10,14 +10,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useToast } from "@/hooks/use-toast"
 import { loginUser } from "@/lib/api/users"
 
 const loginSchema = z.object({
   login: z.string().min(1, "Логин обязателен"),
   password: z.string().min(1, "Пароль обязателен"),
-  role: z.enum(["student", "observer", "accountant", "admin"]),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
@@ -32,7 +30,6 @@ export function LoginForm() {
     defaultValues: {
       login: "",
       password: "",
-      role: "student",
     },
   })
 
@@ -56,7 +53,7 @@ export function LoginForm() {
     } catch (error) {
       toast({
         title: "Ошибка входа",
-        description: "Неверный логин, пароль или роль",
+        description: "Неверный логин или пароль",
         variant: "destructive",
       })
     } finally {
@@ -93,52 +90,6 @@ export function LoginForm() {
               {form.formState.errors.password && (
                   <p className="text-sm text-red-500">{form.formState.errors.password.message}</p>
               )}
-            </div>
-            <div className="space-y-2">
-              <Label>Роль</Label>
-              <RadioGroup
-                  defaultValue="student"
-                  className="grid grid-cols-2 gap-4"
-                  onValueChange={(value) => form.setValue("role", value as "student" | "observer" | "accountant" | "admin")}
-              >
-                <div>
-                  <RadioGroupItem value="student" id="student" className="peer sr-only" />
-                  <Label
-                      htmlFor="student"
-                      className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                  >
-                    Студент
-                  </Label>
-                </div>
-                <div>
-                  <RadioGroupItem value="observer" id="observer" className="peer sr-only" />
-                  <Label
-                      htmlFor="observer"
-                      className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                  >
-                    Наблюдатель
-                  </Label>
-                </div>
-                <div>
-                  <RadioGroupItem value="accountant" id="accountant" className="peer sr-only" />
-                  <Label
-                      htmlFor="accountant"
-                      className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                  >
-                    Бухгалтер
-                  </Label>
-                </div>
-                <div>
-                  <RadioGroupItem value="admin" id="admin" className="peer sr-only" />
-                  <Label
-                      htmlFor="admin"
-                      className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                  >
-                    Администратор
-                  </Label>
-                </div>
-              </RadioGroup>
-              {form.formState.errors.role && <p className="text-sm text-red-500">{form.formState.errors.role.message}</p>}
             </div>
           </CardContent>
           <CardFooter>
