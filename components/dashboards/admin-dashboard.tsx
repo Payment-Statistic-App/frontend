@@ -688,7 +688,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                     <TabsTrigger value="operations">Операции</TabsTrigger>
                 </TabsList>
                 <TabsContent value="users" className="space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex items-center space-x-2">
                             <Input
                                 type="search"
@@ -709,7 +709,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                 </SelectContent>
                             </Select>
                         </div>
-                        <Button onClick={() => setIsNewUserOpen(true)}>
+                        <Button onClick={() => setIsNewUserOpen(true)} className="w-full sm:w-auto">
                             <UserPlus className="mr-2 h-4 w-4" />
                             <span className="hidden sm:inline">Добавить пользователя</span>
                             <span className="sm:hidden">Добавить</span>
@@ -772,7 +772,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                                             <X className="h-4 w-4 mr-2 sm:mr-0" />
                                                             <span className="sm:hidden md:inline">Из группы</span>
                                                         </Button>
-                                                    ) : (
+                                                    ) : user.role === "student" ? (
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
@@ -784,7 +784,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                                             <Plus className="h-4 w-4 mr-2 sm:mr-0" />
                                                             <span className="sm:hidden md:inline">В группу</span>
                                                         </Button>
-                                                    )}
+                                                    ) : null}
                                                 </div>
                                             </td>
                                         </tr>
@@ -804,14 +804,15 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                     <Pagination currentPage={currentUsersPage} totalPages={totalUsersPages} onPageChange={setCurrentUsersPage} />
                 </TabsContent>
                 <TabsContent value="groups" className="space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <Input
                             type="search"
                             placeholder="Поиск групп..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full sm:w-auto sm:flex-1"
                         />
-                        <Button onClick={() => setIsNewGroupOpen(true)}>
+                        <Button onClick={() => setIsNewGroupOpen(true)} className="w-full sm:w-auto">
                             <Plus className="mr-2 h-4 w-4" />
                             <span className="hidden sm:inline">Добавить группу</span>
                             <span className="sm:hidden">Добавить</span>
@@ -830,6 +831,9 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                         <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">
                                             Название
                                         </th>
+                                        <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">
+                                            Студенты
+                                        </th>
                                         <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground pl-7">
                                             Действия
                                         </th>
@@ -842,6 +846,34 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                             className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                                         >
                                             <td className="p-4 align-middle font-medium">{group.name}</td>
+                                            <td className="p-4 align-middle">
+                                                <div className="max-h-32 overflow-y-auto">
+                                                    {group.users && group.users.length > 0 ? (
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {group.users.map((student) => (
+                                                                <div
+                                                                    key={student.id}
+                                                                    className="flex items-center bg-muted rounded-md px-2 py-1 text-xs"
+                                                                >
+                                    <span className="mr-1">
+                                      {student.surname} {student.name}
+                                    </span>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        className="h-4 w-4 p-0 hover:bg-transparent"
+                                                                        onClick={() => handleRemoveFromGroup(student.id)}
+                                                                    >
+                                                                        <X className="h-3 w-3" />
+                                                                    </Button>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted-foreground text-xs">Нет студентов</span>
+                                                    )}
+                                                </div>
+                                            </td>
                                             <td className="p-4 align-middle">
                                                 <div className="flex flex-wrap gap-2">
                                                     <Button
@@ -866,7 +898,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                     ))}
                                     {paginatedGroups.length === 0 && (
                                         <tr>
-                                            <td colSpan={2} className="p-4 text-center">
+                                            <td colSpan={3} className="p-4 text-center">
                                                 Нет групп
                                             </td>
                                         </tr>
@@ -883,14 +915,15 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                     />
                 </TabsContent>
                 <TabsContent value="semesters" className="space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <Input
                             type="search"
                             placeholder="Поиск семестров..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full sm:w-auto sm:flex-1"
                         />
-                        <Button onClick={() => setIsNewSemesterOpen(true)}>
+                        <Button onClick={() => setIsNewSemesterOpen(true)} className="w-full sm:w-auto">
                             <Plus className="mr-2 h-4 w-4" />
                             <span className="hidden sm:inline">Добавить семестр</span>
                             <span className="sm:hidden">Добавить</span>
@@ -962,16 +995,17 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                     />
                 </TabsContent>
                 <TabsContent value="operations" className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
+                    <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:justify-between">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:flex md:items-center gap-2">
                             <Input
                                 type="search"
                                 placeholder="Поиск операций..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full md:w-auto"
                             />
                             <Select value={operationFilter} onValueChange={setOperationFilter}>
-                                <SelectTrigger className="w-[180px]">
+                                <SelectTrigger className="w-full md:w-[180px]">
                                     <SelectValue placeholder="Все типы" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -983,7 +1017,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                 </SelectContent>
                             </Select>
                             <Select value={dateFilter} onValueChange={setDateFilter}>
-                                <SelectTrigger className="w-[180px]">
+                                <SelectTrigger className="w-full md:w-[180px]">
                                     <SelectValue placeholder="Все даты" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -994,7 +1028,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                 </SelectContent>
                             </Select>
                         </div>
-                        <Button variant="outline" size="sm" onClick={toggleSortDirection}>
+                        <Button variant="outline" size="sm" onClick={toggleSortDirection} className="w-full sm:w-auto md:mt-0">
                             {sortDirection === "desc" ? (
                                 <>
                                     Сначала новые <ArrowDown className="ml-2 h-4 w-4" />
@@ -1023,7 +1057,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                         <th className="h-12 px-4 font-medium [&amp;[data-state=selected]]:text-foreground">
                                             Комментарий
                                         </th>
-                                        <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Инициатор</th>
+                                        <th className="h-12 px-4 font-medium [&amp;[data-state=selected]]:text-foreground">Инициатор</th>
                                     </tr>
                                     </thead>
                                     <tbody>
