@@ -108,7 +108,7 @@ export function StudentDashboard({ user, semesters }: StudentDashboardProps) {
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <div className="rounded-md border min-w-[600px]">
+              <div className="rounded-md border min-w-[600px] w-full">
                 <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted">
                   <div className="col-span-4">Семестр</div>
                   <div className="col-span-3 text-center">Статус</div>
@@ -136,7 +136,8 @@ export function StudentDashboard({ user, semesters }: StudentDashboardProps) {
                           <div className="col-span-5 text-right space-x-2">
                             {isPaid ? (
                                 <Button variant="outline" size="sm" onClick={() => handleReceiptClick(semester)}>
-                                  Справка об оплате
+                                  <span className="hidden sm:inline">Справка об оплате</span>
+                                  <span className="sm:hidden">Справка</span>
                                 </Button>
                             ) : (
                                 <Button variant="default" size="sm" onClick={() => handlePayClick(semester)}>
@@ -171,7 +172,7 @@ export function StudentDashboard({ user, semesters }: StudentDashboardProps) {
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <div className="rounded-md border min-w-[600px]">
+              <div className="rounded-md border min-w-[600px] w-full">
                 <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted">
                   <div className="col-span-4">Семестр</div>
                   <div className="col-span-3">Сумма</div>

@@ -351,7 +351,7 @@ export function AccountantDashboard({ user, semesters }: AccountantDashboardProp
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
-                      <div className="rounded-md border min-w-[800px]">
+                      <div className="rounded-md border min-w-[800px] w-full">
                         <div className="grid grid-cols-12 p-4 text-sm font-medium bg-muted">
                           <div className="col-span-4">Студент</div>
                           <div className="col-span-2">Семестр</div>
@@ -365,7 +365,7 @@ export function AccountantDashboard({ user, semesters }: AccountantDashboardProp
 
                             return (
                                 <div key={transaction.id} className="grid grid-cols-12 p-4 text-sm items-center">
-                                  <div className="col-span-4">
+                                  <div className="col-span-4 truncate">
                                     {transaction.student.surname} {transaction.student.name} {transaction.student.patronymic}
                                   </div>
                                   <div className="col-span-2">{semester ? semester.name : transaction.semester_id}</div>
@@ -377,7 +377,8 @@ export function AccountantDashboard({ user, semesters }: AccountantDashboardProp
                                         size="sm"
                                         onClick={() => handleViewReceipt(transaction, transaction.student, semester)}
                                     >
-                                      Справка
+                                      <span className="hidden sm:inline">Справка</span>
+                                      <FileText className="h-4 w-4 sm:hidden" />
                                     </Button>
                                   </div>
                                 </div>
@@ -519,7 +520,7 @@ export function AccountantDashboard({ user, semesters }: AccountantDashboardProp
               <DialogDescription>Информация о статусе оплаты по всем студентам</DialogDescription>
             </DialogHeader>
 
-            <div ref={reportRef} className="report bg-white p-6 rounded-lg border">
+            <div ref={reportRef} className="report bg-white p-6 rounded-lg border overflow-x-auto">
               <div className="header text-center mb-6">
                 <div className="title text-2xl font-bold">СВОДНЫЙ ОТЧЕТ ПО ОПЛАТЕ</div>
                 <div className="subtitle text-gray-500 mt-1">от {new Date().toLocaleDateString()}</div>

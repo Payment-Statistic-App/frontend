@@ -48,7 +48,7 @@ import {
 } from "lucide-react"
 import { formatDateTime, formatPhoneNumber, isValidPhoneNumber } from "@/lib/utils"
 import { Pagination } from "@/components/pagination"
-import {Badge} from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge"
 
 interface AdminDashboardProps {
     user: UserResponse
@@ -275,7 +275,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
 
     // Обработчики форм
     const handleCreateUser = async () => {
-        // Валидация номера телефона
+        // Валидация номе��а телефона
         if (!isValidPhoneNumber(newUserForm.phone)) {
             toast({
                 title: "Ошибка валидации",
@@ -720,83 +720,85 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Загрузка...
                         </div>
                     ) : (
-                        <div className="rounded-md border">
-                            <table className="w-full text-sm">
-                                <thead className="[&amp;:not([align=left])]:text-left">
-                                <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                    <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">ФИО</th>
-                                    <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Телефон</th>
-                                    <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Логин</th>
-                                    <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Роль</th>
-                                    <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Действия</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {paginatedUsers.map((user) => (
-                                    <tr
-                                        key={user.id}
-                                        className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                                    >
-                                        <td className="p-4 align-middle font-medium">
-                                            {user.surname} {user.name} {user.patronymic}
-                                        </td>
-                                        <td className="p-4 align-middle">{user.phone}</td>
-                                        <td className="p-4 align-middle">{user.login}</td>
-                                        <td className="p-4 align-middle">{getRoleName(user.role)}</td>
-                                        <td className="p-4 align-middle">
-                                            <div className="flex flex-wrap gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => {
-                                                        setSelectedUser(user)
-                                                        setEditUserForm({
-                                                            name: user.name,
-                                                            surname: user.surname,
-                                                            patronymic: user.patronymic,
-                                                            phone: user.phone,
-                                                        })
-                                                        setIsEditUserOpen(true)
-                                                    }}
-                                                >
-                                                    <Edit className="h-4 w-4 mr-2 sm:mr-0" />
-                                                    <span className="sm:hidden md:inline">Изменить</span>
-                                                </Button>
-                                                <Button variant="ghost" size="sm" onClick={() => handleDeleteUser(user.id)}>
-                                                    <Trash className="h-4 w-4 mr-2 sm:mr-0" />
-                                                    <span className="sm:hidden md:inline">Удалить</span>
-                                                </Button>
-                                                {user.group_id ? (
-                                                    <Button variant="ghost" size="sm" onClick={() => handleRemoveFromGroup(user.id)}>
-                                                        <X className="h-4 w-4 mr-2 sm:mr-0" />
-                                                        <span className="sm:hidden md:inline">Из группы</span>
-                                                    </Button>
-                                                ) : (
+                        <div className="overflow-x-auto">
+                            <div className="rounded-md border min-w-[800px]">
+                                <table className="w-full text-sm">
+                                    <thead className="[&amp;:not([align=left])]:text-left">
+                                    <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                        <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">ФИО</th>
+                                        <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Телефон</th>
+                                        <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Логин</th>
+                                        <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Роль</th>
+                                        <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Действия</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {paginatedUsers.map((user) => (
+                                        <tr
+                                            key={user.id}
+                                            className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                                        >
+                                            <td className="p-4 align-middle font-medium">
+                                                {user.surname} {user.name} {user.patronymic}
+                                            </td>
+                                            <td className="p-4 align-middle">{user.phone}</td>
+                                            <td className="p-4 align-middle">{user.login}</td>
+                                            <td className="p-4 align-middle">{getRoleName(user.role)}</td>
+                                            <td className="p-4 align-middle">
+                                                <div className="flex flex-wrap gap-2">
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => {
-                                                            setSelectedUserForGroup(user)
-                                                            setIsAddToGroupOpen(true)
+                                                            setSelectedUser(user)
+                                                            setEditUserForm({
+                                                                name: user.name,
+                                                                surname: user.surname,
+                                                                patronymic: user.patronymic,
+                                                                phone: user.phone,
+                                                            })
+                                                            setIsEditUserOpen(true)
                                                         }}
                                                     >
-                                                        <Plus className="h-4 w-4 mr-2 sm:mr-0" />
-                                                        <span className="sm:hidden md:inline">В группу</span>
+                                                        <Edit className="h-4 w-4 mr-2 sm:mr-0" />
+                                                        <span className="sm:hidden md:inline">Изменить</span>
                                                     </Button>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {paginatedUsers.length === 0 && (
-                                    <tr>
-                                        <td colSpan={5} className="p-4 text-center">
-                                            Нет пользователей
-                                        </td>
-                                    </tr>
-                                )}
-                                </tbody>
-                            </table>
+                                                    <Button variant="ghost" size="sm" onClick={() => handleDeleteUser(user.id)}>
+                                                        <Trash className="h-4 w-4 mr-2 sm:mr-0" />
+                                                        <span className="sm:hidden md:inline">Удалить</span>
+                                                    </Button>
+                                                    {user.group_id ? (
+                                                        <Button variant="ghost" size="sm" onClick={() => handleRemoveFromGroup(user.id)}>
+                                                            <X className="h-4 w-4 mr-2 sm:mr-0" />
+                                                            <span className="sm:hidden md:inline">Из группы</span>
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                setSelectedUserForGroup(user)
+                                                                setIsAddToGroupOpen(true)
+                                                            }}
+                                                        >
+                                                            <Plus className="h-4 w-4 mr-2 sm:mr-0" />
+                                                            <span className="sm:hidden md:inline">В группу</span>
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {paginatedUsers.length === 0 && (
+                                        <tr>
+                                            <td colSpan={5} className="p-4 text-center">
+                                                Нет пользователей
+                                            </td>
+                                        </tr>
+                                    )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
                     <Pagination currentPage={currentUsersPage} totalPages={totalUsersPages} onPageChange={setCurrentUsersPage} />
@@ -820,52 +822,58 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Загрузка...
                         </div>
                     ) : (
-                        <div className="rounded-md border">
-                            <table className="w-full text-sm">
-                                <thead className="[&amp;:not([align=left])]:text-left">
-                                <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                    <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Название</th>
-                                    <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground pl-7">Действия</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {paginatedGroups.map((group) => (
-                                    <tr
-                                        key={group.id}
-                                        className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                                    >
-                                        <td className="p-4 align-middle font-medium">{group.name}</td>
-                                        <td className="p-4 align-middle">
-                                            <div className="flex flex-wrap gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => {
-                                                        setSelectedGroup(group)
-                                                        setEditGroupForm({ name: group.name })
-                                                        setIsEditGroupOpen(true)
-                                                    }}
-                                                >
-                                                    <Edit className="h-4 w-4 mr-2 sm:mr-0" />
-                                                    <span className="sm:hidden md:inline">Изменить</span>
-                                                </Button>
-                                                <Button variant="ghost" size="sm" onClick={() => handleDeleteGroup(group.id)}>
-                                                    <Trash className="h-4 w-4 mr-2 sm:mr-0" />
-                                                    <span className="sm:hidden md:inline">Удалить</span>
-                                                </Button>
-                                            </div>
-                                        </td>
+                        <div className="overflow-x-auto">
+                            <div className="rounded-md border min-w-[600px]">
+                                <table className="w-full text-sm">
+                                    <thead className="[&amp;:not([align=left])]:text-left">
+                                    <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                        <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">
+                                            Название
+                                        </th>
+                                        <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground pl-7">
+                                            Действия
+                                        </th>
                                     </tr>
-                                ))}
-                                {paginatedGroups.length === 0 && (
-                                    <tr>
-                                        <td colSpan={2} className="p-4 text-center">
-                                            Нет групп
-                                        </td>
-                                    </tr>
-                                )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    {paginatedGroups.map((group) => (
+                                        <tr
+                                            key={group.id}
+                                            className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                                        >
+                                            <td className="p-4 align-middle font-medium">{group.name}</td>
+                                            <td className="p-4 align-middle">
+                                                <div className="flex flex-wrap gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setSelectedGroup(group)
+                                                            setEditGroupForm({ name: group.name })
+                                                            setIsEditGroupOpen(true)
+                                                        }}
+                                                    >
+                                                        <Edit className="h-4 w-4 mr-2 sm:mr-0" />
+                                                        <span className="sm:hidden md:inline">Изменить</span>
+                                                    </Button>
+                                                    <Button variant="ghost" size="sm" onClick={() => handleDeleteGroup(group.id)}>
+                                                        <Trash className="h-4 w-4 mr-2 sm:mr-0" />
+                                                        <span className="sm:hidden md:inline">Удалить</span>
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {paginatedGroups.length === 0 && (
+                                        <tr>
+                                            <td colSpan={2} className="p-4 text-center">
+                                                Нет групп
+                                            </td>
+                                        </tr>
+                                    )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
                     <Pagination
@@ -893,52 +901,58 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Загрузка...
                         </div>
                     ) : (
-                        <div className="rounded-md border">
-                            <table className="w-full text-sm">
-                                <thead className="[&amp;:not([align=left])]:text-left">
-                                <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                    <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Название</th>
-                                    <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground pl-7">Действия</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {paginatedSemesters.map((semester) => (
-                                    <tr
-                                        key={semester.id}
-                                        className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                                    >
-                                        <td className="p-4 align-middle font-medium">{semester.name}</td>
-                                        <td className="p-4 align-middle">
-                                            <div className="flex flex-wrap gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => {
-                                                        setSelectedSemester(semester)
-                                                        setEditSemesterForm({ name: semester.name })
-                                                        setIsEditSemesterOpen(true)
-                                                    }}
-                                                >
-                                                    <Edit className="h-4 w-4 mr-2 sm:mr-0" />
-                                                    <span className="sm:hidden md:inline">Изменить</span>
-                                                </Button>
-                                                <Button variant="ghost" size="sm" onClick={() => handleDeleteSemester(semester.id)}>
-                                                    <Trash className="h-4 w-4 mr-2 sm:mr-0" />
-                                                    <span className="sm:hidden md:inline">Удалить</span>
-                                                </Button>
-                                            </div>
-                                        </td>
+                        <div className="overflow-x-auto">
+                            <div className="rounded-md border min-w-[600px]">
+                                <table className="w-full text-sm">
+                                    <thead className="[&amp;:not([align=left])]:text-left">
+                                    <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                        <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">
+                                            Название
+                                        </th>
+                                        <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground pl-7">
+                                            Действия
+                                        </th>
                                     </tr>
-                                ))}
-                                {paginatedSemesters.length === 0 && (
-                                    <tr>
-                                        <td colSpan={2} className="p-4 text-center">
-                                            Нет семестров
-                                        </td>
-                                    </tr>
-                                )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    {paginatedSemesters.map((semester) => (
+                                        <tr
+                                            key={semester.id}
+                                            className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                                        >
+                                            <td className="p-4 align-middle font-medium">{semester.name}</td>
+                                            <td className="p-4 align-middle">
+                                                <div className="flex flex-wrap gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setSelectedSemester(semester)
+                                                            setEditSemesterForm({ name: semester.name })
+                                                            setIsEditSemesterOpen(true)
+                                                        }}
+                                                    >
+                                                        <Edit className="h-4 w-4 mr-2 sm:mr-0" />
+                                                        <span className="sm:hidden md:inline">Изменить</span>
+                                                    </Button>
+                                                    <Button variant="ghost" size="sm" onClick={() => handleDeleteSemester(semester.id)}>
+                                                        <Trash className="h-4 w-4 mr-2 sm:mr-0" />
+                                                        <span className="sm:hidden md:inline">Удалить</span>
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {paginatedSemesters.length === 0 && (
+                                        <tr>
+                                            <td colSpan={2} className="p-4 text-center">
+                                                Нет семестров
+                                            </td>
+                                        </tr>
+                                    )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
                     <Pagination
@@ -997,46 +1011,52 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Загрузка...
                         </div>
                     ) : (
-                        <div className="rounded-md border">
-                            <table className="w-full text-sm">
-                                <thead className="[&amp;:not([align=left])]:text-left">
-                                <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                    <th className="h-12 px-4 font-medium [&amp;[data-state=selected]]:text-foreground">Дата и время</th>
-                                    <th className="h-12 px-4 font-medium [&amp;[data-state=selected]]:text-foreground">Тип</th>
-                                    <th className="h-12 px-4 font-medium [&amp;[data-state=selected]]:text-foreground">Комментарий</th>
-                                    <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Инициатор</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {paginatedOperations.map((operation) => (
-                                    <tr
-                                        key={operation.id}
-                                        className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                                    >
-                                        <td className="p-4 align-middle">{formatDateTime(operation.created_at)}</td>
-                                        <td className="p-4 align-middle font-medium">
-                                            <div className="flex items-center space-x-2">
-                                                {renderOperationIcon(operation.type)}
-                                                <span>{operationTypeNames[operation.type]}</span>
-                                            </div>
-                                        </td>
-                                        <td className="p-4 align-middle">{operation.comment}</td>
-                                        <td className="p-4 align-middle">
-                                            <Button variant="link" onClick={() => handleShowInitiatorInfo(operation.initiator)}>
-                                                {operation.initiator.surname} {operation.initiator.name}
-                                            </Button>
-                                        </td>
+                        <div className="overflow-x-auto">
+                            <div className="rounded-md border min-w-[800px]">
+                                <table className="w-full text-sm">
+                                    <thead className="[&amp;:not([align=left])]:text-left">
+                                    <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                        <th className="h-12 px-4 font-medium [&amp;[data-state=selected]]:text-foreground">
+                                            Дата и время
+                                        </th>
+                                        <th className="h-12 px-4 font-medium [&amp;[data-state=selected]]:text-foreground">Тип</th>
+                                        <th className="h-12 px-4 font-medium [&amp;[data-state=selected]]:text-foreground">
+                                            Комментарий
+                                        </th>
+                                        <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Инициатор</th>
                                     </tr>
-                                ))}
-                                {paginatedOperations.length === 0 && (
-                                    <tr>
-                                        <td colSpan={4} className="p-4 text-center">
-                                            Нет операций
-                                        </td>
-                                    </tr>
-                                )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    {paginatedOperations.map((operation) => (
+                                        <tr
+                                            key={operation.id}
+                                            className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                                        >
+                                            <td className="p-4 align-middle">{formatDateTime(operation.created_at)}</td>
+                                            <td className="p-4 align-middle font-medium">
+                                                <div className="flex items-center space-x-2">
+                                                    {renderOperationIcon(operation.type)}
+                                                    <span>{operationTypeNames[operation.type]}</span>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 align-middle">{operation.comment}</td>
+                                            <td className="p-4 align-middle">
+                                                <Button variant="link" onClick={() => handleShowInitiatorInfo(operation.initiator)}>
+                                                    {operation.initiator.surname} {operation.initiator.name}
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {paginatedOperations.length === 0 && (
+                                        <tr>
+                                            <td colSpan={4} className="p-4 text-center">
+                                                Нет операций
+                                            </td>
+                                        </tr>
+                                    )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
                     <Pagination
@@ -1094,8 +1114,10 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                 onChange={(e) => handlePhoneChange(e, setNewUserForm, newUserForm)}
                                 onKeyDown={(e) => {
                                     // Если номер уже полный и это не управляющая клавиша - блокируем ввод
-                                    if (isValidPhoneNumber(newUserForm.phone) &&
-                                        !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+                                    if (
+                                        isValidPhoneNumber(newUserForm.phone) &&
+                                        !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)
+                                    ) {
                                         e.preventDefault()
                                     }
                                 }}
@@ -1127,7 +1149,9 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                             <Label htmlFor="role">Роль</Label>
                             <Select
                                 value={newUserForm.role}
-                                onValueChange={(value: "student" | "observer" | "accountant" | "admin") => setNewUserForm({ ...newUserForm, role: value })}
+                                onValueChange={(value: "student" | "observer" | "accountant" | "admin") =>
+                                    setNewUserForm({ ...newUserForm, role: value })
+                                }
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Выберите роль" />
@@ -1191,7 +1215,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="phone" className="text-right">
-                                Телефон
+                                Тел��фон
                             </Label>
                             <Input
                                 id="phone"

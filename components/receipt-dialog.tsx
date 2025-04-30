@@ -162,85 +162,87 @@ export function ReceiptDialog({ open, onOpenChange, transaction, user, semester 
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px]">
-        <DialogHeader>
-          <DialogTitle>Справка об оплате</DialogTitle>
-          <DialogDescription>Справка об оплате за {semester?.name || "семестр"}</DialogDescription>
-        </DialogHeader>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[700px]">
+          <DialogHeader>
+            <DialogTitle>Справка об оплате</DialogTitle>
+            <DialogDescription>Справка об оплате за {semester?.name || "семестр"}</DialogDescription>
+          </DialogHeader>
 
-        <div ref={receiptRef} className="receipt">
-          <div className="header">
-            <div className="title">СПРАВКА ОБ ОПЛАТЕ</div>
-            <div>№ {transaction.id.substring(0, 8)}</div>
-            <div>от {formatDate(transaction.created_at)}</div>
-          </div>
-
-          <div className="content">
-            <p>
-              Настоящая справка подтверждает, что студент{" "}
-              <strong>
-                {user.surname} {user.name} {user.patronymic}
-              </strong>
-              произвел оплату за обучение в размере <strong>{transaction.amount} ₽</strong>
-              за <strong>{semester?.name || "семестр"}</strong>.
-            </p>
-
-            <table>
-              <thead>
-                <tr>
-                  <th>Параметр</th>
-                  <th>Значение</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>ФИО студента</td>
-                  <td>
-                    {user.surname} {user.name} {user.patronymic}
-                  </td>
-                </tr>
-                <tr>
-                  <td>Семестр</td>
-                  <td>{semester?.name || "Не указан"}</td>
-                </tr>
-                <tr>
-                  <td>Сумма оплаты</td>
-                  <td>{transaction.amount} ₽</td>
-                </tr>
-                <tr>
-                  <td>Дата оплаты</td>
-                  <td>{formatDate(transaction.created_at)}</td>
-                </tr>
-                <tr>
-                  <td>Номер транзакции</td>
-                  <td>{transaction.id}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className="footer">
-            <div>
-              <p>Подпись уполномоченного лица: _________________</p>
+          <div ref={receiptRef} className="receipt overflow-auto">
+            <div className="header">
+              <div className="title">СПРАВКА ОБ ОПЛАТЕ</div>
+              <div>№ {transaction.id.substring(0, 8)}</div>
+              <div>от {formatDate(transaction.created_at)}</div>
             </div>
-            <div>
-              <p>М.П.</p>
+
+            <div className="content">
+              <p>
+                Настоящая справка подтверждает, что студент{" "}
+                <strong>
+                  {user.surname} {user.name} {user.patronymic}
+                </strong>{" "}
+                произвел оплату за обучение в размере <strong>{transaction.amount} ₽</strong> за{" "}
+                <strong>{semester?.name || "семестр"}</strong>.
+              </p>
+
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                  <tr>
+                    <th>Параметр</th>
+                    <th>Значение</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td>ФИО студента</td>
+                    <td>
+                      {user.surname} {user.name} {user.patronymic}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Семестр</td>
+                    <td>{semester?.name || "Не указан"}</td>
+                  </tr>
+                  <tr>
+                    <td>Сумма оплаты</td>
+                    <td>{transaction.amount} ₽</td>
+                  </tr>
+                  <tr>
+                    <td>Дата оплаты</td>
+                    <td>{formatDate(transaction.created_at)}</td>
+                  </tr>
+                  <tr>
+                    <td>Номер транзакции</td>
+                    <td>{transaction.id}</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="footer">
+              <div>
+                <p>Подпись уполномоченного лица: _________________</p>
+              </div>
+              <div>
+                <p>М.П.</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <DialogFooter className="flex flex-col sm:flex-row gap-2">
-          <Button variant="outline" onClick={handlePrint} className="w-full sm:w-auto">
-            <Printer className="mr-2 h-4 w-4" />
-            Печать
-          </Button>
-          <Button onClick={handleDownload} className="w-full sm:w-auto">
-            <Download className="mr-2 h-4 w-4" />
-            Скачать
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={handlePrint} className="w-full sm:w-auto">
+              <Printer className="mr-2 h-4 w-4" />
+              Печать
+            </Button>
+            <Button onClick={handleDownload} className="w-full sm:w-auto">
+              <Download className="mr-2 h-4 w-4" />
+              Скачать
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
   )
 }
