@@ -216,12 +216,12 @@ export function ObserverDashboard({ user, semesters }: ObserverDashboardProps) {
   // Расчет статистики по семестрам
   const semesterStats = semesters.map((semester) => {
     const paidCount = students.filter((student) =>
-      student.transactions.some((t) => t.semester_id === semester.id),
+        student.transactions.some((t) => t.semester_id === semester.id),
     ).length
     const totalAmount = students.reduce(
-      (sum, student) =>
-        sum + student.transactions.filter((t) => t.semester_id === semester.id).reduce((s, t) => s + t.amount, 0),
-      0,
+        (sum, student) =>
+            sum + student.transactions.filter((t) => t.semester_id === semester.id).reduce((s, t) => s + t.amount, 0),
+        0,
     )
 
     return {
@@ -234,123 +234,123 @@ export function ObserverDashboard({ user, semesters }: ObserverDashboardProps) {
   })
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Панель наблюдателя</h1>
-          <p className="text-muted-foreground">Просмотр отчетов по оплате обучения студентами</p>
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Панель наблюдателя</h1>
+            <p className="text-muted-foreground">Просмотр отчетов по оплате обучения студентами</p>
+          </div>
+          <div className="mt-4 md:mt-0">
+            <Button onClick={() => setIsReportOpen(true)}>
+              <FileText className="mr-2 h-4 w-4" />
+              Сводный отчет
+            </Button>
+          </div>
         </div>
-        <div className="mt-4 md:mt-0">
-          <Button onClick={() => setIsReportOpen(true)}>
-            <FileText className="mr-2 h-4 w-4" />
-            Сводный отчет
-          </Button>
-        </div>
-      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Сводная статистика</CardTitle>
-          <CardDescription>Общая информация по оплате</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="text-center p-4">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-              <p className="mt-2">Загрузка данных...</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h3 className="text-sm font-medium text-blue-800">Всего студентов</h3>
-                <p className="text-2xl font-bold text-blue-900">{students.length}</p>
+        <Card>
+          <CardHeader>
+            <CardTitle>Сводная статистика</CardTitle>
+            <CardDescription>Общая информация по оплате</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+                <div className="text-center p-4">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+                  <p className="mt-2">Загрузка данных...</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-blue-800">Всего студентов</h3>
+                    <p className="text-2xl font-bold text-blue-900">{students.length}</p>
+                  </div>
+
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-green-800">Оплатили хотя бы 1 семестр</h3>
+                    <p className="text-2xl font-bold text-green-900">
+                      {students.filter((student) => student.transactions.length > 0).length}
+                    </p>
+                  </div>
+
+                  <div className="bg-amber-50 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-amber-800">Общая сумма оплат</h3>
+                    <p className="text-2xl font-bold text-amber-900">
+                      {students.reduce((sum, student) => sum + student.transactions.reduce((s, t) => s + t.amount, 0), 0)} ₽
+                    </p>
+                  </div>
+                </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Диалог сводного отчета */}
+        <Dialog open={isReportOpen} onOpenChange={setIsReportOpen}>
+          <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Сводный отчет по оплате</DialogTitle>
+              <DialogDescription>Информация о статусе оплаты по всем студентам</DialogDescription>
+            </DialogHeader>
+
+            <div ref={reportRef} className="report bg-white p-6 rounded-lg border overflow-x-auto">
+              <div className="header text-center mb-6">
+                <div className="title text-2xl font-bold">СВОДНЫЙ ОТЧЕТ ПО ОПЛАТЕ</div>
+                <div className="subtitle text-gray-500 mt-1">от {new Date().toLocaleDateString()}</div>
               </div>
 
-              <div className="bg-green-50 p-4 rounded-lg">
-                <h3 className="text-sm font-medium text-green-800">Оплатили хотя бы 1 семестр</h3>
-                <p className="text-2xl font-bold text-green-900">
-                  {students.filter((student) => student.transactions.length > 0).length}
-                </p>
-              </div>
-
-              <div className="bg-amber-50 p-4 rounded-lg">
-                <h3 className="text-sm font-medium text-amber-800">Общая сумма оплат</h3>
-                <p className="text-2xl font-bold text-amber-900">
-                  {students.reduce((sum, student) => sum + student.transactions.reduce((s, t) => s + t.amount, 0), 0)} ₽
-                </p>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Диалог сводного отчета */}
-      <Dialog open={isReportOpen} onOpenChange={setIsReportOpen}>
-        <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Сводный отчет по оплате</DialogTitle>
-            <DialogDescription>Информация о статусе оплаты по всем студентам</DialogDescription>
-          </DialogHeader>
-
-          <div ref={reportRef} className="report bg-white p-6 rounded-lg border">
-            <div className="header text-center mb-6">
-              <div className="title text-2xl font-bold">СВОДНЫЙ ОТЧЕТ ПО ОПЛАТЕ</div>
-              <div className="subtitle text-gray-500 mt-1">от {new Date().toLocaleDateString()}</div>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
                   <tr>
                     <th className="border p-2 bg-gray-50">ФИО студента</th>
                     {semesters.map((semester) => (
-                      <th key={semester.id} className="border p-2 bg-gray-50">
-                        {semester.name}
-                      </th>
+                        <th key={semester.id} className="border p-2 bg-gray-50">
+                          {semester.name}
+                        </th>
                     ))}
                     <th className="border p-2 bg-gray-50">Всего оплачено</th>
                   </tr>
-                </thead>
-                <tbody>
+                  </thead>
+                  <tbody>
                   {students.map((student) => {
                     const totalPaid = student.transactions.reduce((sum, transaction) => sum + transaction.amount, 0)
 
                     return (
-                      <tr key={student.id}>
-                        <td className="border p-2">
-                          {student.surname} {student.name} {student.patronymic}
-                        </td>
+                        <tr key={student.id}>
+                          <td className="border p-2">
+                            {student.surname} {student.name} {student.patronymic}
+                          </td>
 
-                        {semesters.map((semester) => {
-                          const isPaid = isSemesterPaid(student.transactions, semester.id)
-                          const transaction = student.transactions.find((t) => t.semester_id === semester.id)
+                          {semesters.map((semester) => {
+                            const isPaid = isSemesterPaid(student.transactions, semester.id)
+                            const transaction = student.transactions.find((t) => t.semester_id === semester.id)
 
-                          return (
-                            <td key={semester.id} className="border p-2 text-center">
-                              {isPaid ? (
-                                <span className="text-green-600 font-medium">
+                            return (
+                                <td key={semester.id} className="border p-2 text-center">
+                                  {isPaid ? (
+                                      <span className="text-green-600 font-medium">
                                   Оплачено ({transaction ? transaction.amount : 0} ₽)
                                 </span>
-                              ) : (
-                                <span className="text-red-600 font-medium">Не оплачено</span>
-                              )}
-                            </td>
-                          )
-                        })}
+                                  ) : (
+                                      <span className="text-red-600 font-medium">Не оплачено</span>
+                                  )}
+                                </td>
+                            )
+                          })}
 
-                        <td className="border p-2 text-center font-medium">{totalPaid} ₽</td>
-                      </tr>
+                          <td className="border p-2 text-center font-medium">{totalPaid} ₽</td>
+                        </tr>
                     )
                   })}
-                </tbody>
-              </table>
-            </div>
+                  </tbody>
+                </table>
+              </div>
 
-            <div className="summary mt-8 pt-4 border-t">
-              <h3 className="text-lg font-medium mb-3">Статистика по семестрам:</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
+              <div className="summary mt-8 pt-4 border-t">
+                <h3 className="text-lg font-medium mb-3">Статистика по семестрам:</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
                     <tr>
                       <th className="border p-2 bg-gray-50">Семестр</th>
                       <th className="border p-2 bg-gray-50">Оплатили</th>
@@ -358,53 +358,53 @@ export function ObserverDashboard({ user, semesters }: ObserverDashboardProps) {
                       <th className="border p-2 bg-gray-50">Процент оплаты</th>
                       <th className="border p-2 bg-gray-50">Общая сумма</th>
                     </tr>
-                  </thead>
-                  <tbody>
+                    </thead>
+                    <tbody>
                     {semesterStats.map((stat) => (
-                      <tr key={stat.semester.id}>
-                        <td className="border p-2">{stat.semester.name}</td>
-                        <td className="border p-2">{stat.paidCount} студентов</td>
-                        <td className="border p-2">{stat.unpaidCount} студентов</td>
-                        <td className="border p-2">{stat.paidPercentage}%</td>
-                        <td className="border p-2">{stat.totalAmount} ₽</td>
-                      </tr>
+                        <tr key={stat.semester.id}>
+                          <td className="border p-2">{stat.semester.name}</td>
+                          <td className="border p-2">{stat.paidCount} студентов</td>
+                          <td className="border p-2">{stat.unpaidCount} студентов</td>
+                          <td className="border p-2">{stat.paidPercentage}%</td>
+                          <td className="border p-2">{stat.totalAmount} ₽</td>
+                        </tr>
                     ))}
-                  </tbody>
-                </table>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="summary mt-8 pt-4 border-t">
+                <h3 className="text-lg font-medium mb-3">Общая статистика:</h3>
+                <p className="mb-1">
+                  Всего студентов: <strong>{totalStudents}</strong>
+                </p>
+                <p className="mb-1">
+                  Оплатили хотя бы один семестр: <strong>{totalPaidStudents}</strong>
+                </p>
+                <p className="mb-1">
+                  Общая сумма оплат: <strong>{totalAmount} ₽</strong>
+                </p>
+              </div>
+
+              <div className="footer mt-8 text-right">
+                <p className="mb-1">Подпись: _________________</p>
+                <p>Дата: {new Date().toLocaleDateString()}</p>
               </div>
             </div>
 
-            <div className="summary mt-8 pt-4 border-t">
-              <h3 className="text-lg font-medium mb-3">Общая статистика:</h3>
-              <p className="mb-1">
-                Всего студентов: <strong>{totalStudents}</strong>
-              </p>
-              <p className="mb-1">
-                Оплатили хотя бы один семестр: <strong>{totalPaidStudents}</strong>
-              </p>
-              <p className="mb-1">
-                Общая сумма оплат: <strong>{totalAmount} ₽</strong>
-              </p>
-            </div>
-
-            <div className="footer mt-8 text-right">
-              <p className="mb-1">Подпись: _________________</p>
-              <p>Дата: {new Date().toLocaleDateString()}</p>
-            </div>
-          </div>
-
-          <DialogFooter className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={handlePrintReport} className="w-full sm:w-auto">
-              <Printer className="mr-2 h-4 w-4" />
-              Печать
-            </Button>
-            <Button onClick={handleDownloadReport} className="w-full sm:w-auto">
-              <Download className="mr-2 h-4 w-4" />
-              Скачать
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+            <DialogFooter className="flex flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={handlePrintReport} className="w-full sm:w-auto">
+                <Printer className="mr-2 h-4 w-4" />
+                Печать
+              </Button>
+              <Button onClick={handleDownloadReport} className="w-full sm:w-auto">
+                <Download className="mr-2 h-4 w-4" />
+                Скачать
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
   )
 }

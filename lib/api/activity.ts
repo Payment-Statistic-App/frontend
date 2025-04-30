@@ -1,4 +1,5 @@
 import type { OperationResponse } from "@/lib/types"
+import { handleUnauthorized } from "./users"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.energy-cerber.ru"
 
@@ -11,6 +12,11 @@ export async function getOperations(): Promise<OperationResponse[]> {
         Authorization: `Bearer ${token}`,
       },
     })
+
+    if (response.status === 401) {
+      handleUnauthorized()
+      return []
+    }
 
     if (!response.ok) {
       throw new Error("Failed to fetch operations")
