@@ -4,6 +4,7 @@ export interface UserResponse {
   surname: string
   patronymic: string
   group_id: string | null
+  group_name: string | null
   role: "student" | "observer" | "accountant" | "admin"
   phone: string
   login: string

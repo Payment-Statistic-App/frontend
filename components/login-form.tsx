@@ -16,7 +16,7 @@ import { loginUser } from "@/lib/api/users"
 
 const loginSchema = z.object({
   login: z.string().min(1, "Логин обязателен"),
-  password: z.string().min(1, "Парол�� обязателен"),
+  password: z.string().min(1, "Пароль обязателен"),
   role: z.enum(["student", "observer", "accountant", "admin"]),
 })
 

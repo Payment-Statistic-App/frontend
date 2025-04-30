@@ -134,7 +134,7 @@ export function ObserverDashboard({ user, semesters }: ObserverDashboardProps) {
     const html = `
       <html>
         <head>
-          <title>Сводный отчет по опла��е</title>
+          <title>Сводный отчет по оплате</title>
           <style>
             body {
               font-family: Arial, sans-serif;

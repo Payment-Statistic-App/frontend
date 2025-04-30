@@ -95,7 +95,7 @@ export function StudentDashboard({ user, semesters }: StudentDashboardProps) {
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground">Группа</h3>
-                <p className="text-base">{user.group_id ? user.group_id : "Не назначена"}</p>
+                <p className="text-base">{user.group_name ? user.group_name : "Не назначена"}</p>
               </div>
             </div>
           </CardContent>

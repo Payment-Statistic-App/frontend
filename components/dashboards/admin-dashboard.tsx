@@ -275,7 +275,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
 
     // Обработчики форм
     const handleCreateUser = async () => {
-        // Валидация номе��а телефона
+        // Валидация номера телефона
         if (!isValidPhoneNumber(newUserForm.phone)) {
             toast({
                 title: "Ошибка валидации",
@@ -1215,7 +1215,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="phone" className="text-right">
-                                Тел��фон
+                                Телефон
                             </Label>
                             <Input
                                 id="phone"
