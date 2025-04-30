@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ReceiptDialog } from "@/components/receipt-dialog"
 import { getStudents } from "@/lib/api/users"
 import { formatDate } from "@/lib/utils"
-import { Download, Printer, FileText, Loader2 } from "lucide-react"
+import { Download, Printer, FileText, Loader2, FileSpreadsheet } from "lucide-react"
 import { Pagination } from "@/components/pagination"
 import {
   Dialog,
@@ -20,6 +20,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { formatStudentsForExcel, formatSemesterStatsForExcel, formatStudentForExcel } from "@/lib/excel-utils"
+import * as XLSX from "xlsx"
+import { toast } from "@/components/ui/use-toast"
 
 interface AccountantDashboardProps {
   user: UserResponse
@@ -312,6 +315,115 @@ export function AccountantDashboard({ user, semesters }: AccountantDashboardProp
     semesterGroups.push(semesters.slice(i, i + SEMESTERS_PER_COLUMN))
   }
 
+  // Добавим функцию для экспорта всех студентов в Excel
+  const handleExportAllToExcel = () => {
+    try {
+      // Форматируем данные студентов для Excel
+      const studentsData = formatStudentsForExcel(students, semesters)
+
+      // Форматируем статистику по семестрам для Excel
+      const semesterStatsData = formatSemesterStatsForExcel(students, semesters)
+
+      // Создаем и скачиваем Excel файл
+      const workbook = XLSX.utils.book_new()
+
+      // Лист со студентами
+      const studentsWorksheet = XLSX.utils.json_to_sheet(studentsData)
+      XLSX.utils.book_append_sheet(workbook, studentsWorksheet, "Студенты")
+
+      // Лист со статистикой по семестрам
+      const statsWorksheet = XLSX.utils.json_to_sheet(semesterStatsData)
+      XLSX.utils.book_append_sheet(workbook, statsWorksheet, "Статистика по семестрам")
+
+      // Создаем бинарные данные в формате xlsx
+      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" })
+
+      // Создаем Blob из бинарных данных
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      })
+
+      // Создаем URL для Blob
+      const url = URL.createObjectURL(blob)
+
+      // Создаем ссылку для скачивания
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `Сводный_отчет_${new Date().toLocaleDateString()}.xlsx`
+
+      // Добавляем ссылку в DOM, кликаем по ней и удаляем
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+
+      // Освобождаем URL
+      URL.revokeObjectURL(url)
+
+      toast({
+        title: "Успешно",
+        description: "Отчет успешно экспортирован в Excel",
+      })
+    } catch (error) {
+      console.error("Ошибка при экспорте в Excel:", error)
+      toast({
+        title: "Ошибка",
+        description: "Не удалось экспортировать отчет в Excel",
+        variant: "destructive",
+      })
+    }
+  }
+
+  // Добавим функцию для экспорта одного студента в Excel
+  const handleExportStudentToExcel = (student: any) => {
+    try {
+      // Форматируем данные студента для Excel
+      const studentData = formatStudentForExcel(student, semesters)
+
+      // Создаем и скачиваем Excel файл
+      const workbook = XLSX.utils.book_new()
+
+      // Лист с платежами студента
+      const paymentsWorksheet = XLSX.utils.json_to_sheet(studentData)
+      XLSX.utils.book_append_sheet(workbook, paymentsWorksheet, "Платежи")
+
+      // Создаем бинарные данные в формате xlsx
+      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" })
+
+      // Создаем Blob из бинарных данных
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      })
+
+      // Создаем URL для Blob
+      const url = URL.createObjectURL(blob)
+
+      // Создаем ссылку для скачивания
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `Отчет_${student.surname}_${student.name}_${new Date().toLocaleDateString()}.xlsx`
+
+      // Добавляем ссылку в DOM, кликаем по ней и удаляем
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+
+      // Освобождаем URL
+      URL.revokeObjectURL(url)
+
+      toast({
+        title: "Успешно",
+        description: "Отчет по студенту успешно экспортирован в Excel",
+      })
+    } catch (error) {
+      console.error("Ошибка при экспорте в Excel:", error)
+      toast({
+        title: "Ошибка",
+        description: "Не удалось экспортировать отчет в Excel",
+        variant: "destructive",
+      })
+    }
+  }
+
   return (
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -319,10 +431,14 @@ export function AccountantDashboard({ user, semesters }: AccountantDashboardProp
             <h1 className="text-2xl font-bold tracking-tight">Панель бухгалтера</h1>
             <p className="text-muted-foreground">Управление и проверка платежей студентов</p>
           </div>
-          <div className="mt-4 md:mt-0">
+          <div className="mt-4 md:mt-0 flex gap-2">
             <Button onClick={() => setIsReportOpen(true)}>
               <FileText className="mr-2 h-4 w-4" />
               Сводный отчет
+            </Button>
+            <Button variant="outline" onClick={handleExportAllToExcel}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" />
+              Экспорт в Excel
             </Button>
           </div>
         </div>
@@ -476,7 +592,17 @@ export function AccountantDashboard({ user, semesters }: AccountantDashboardProp
                                     </td>
                                 ))}
 
-                                <td className="p-4 text-center font-medium">{totalPaid} ₽</td>
+                                <td className="p-4 text-center font-medium">
+                                  {totalPaid} ₽
+                                  <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleExportStudentToExcel(student)}
+                                      className="ml-2"
+                                  >
+                                    <FileSpreadsheet className="h-4 w-4" />
+                                  </Button>
+                                </td>
                               </tr>
                           )
                         })}
@@ -626,9 +752,13 @@ export function AccountantDashboard({ user, semesters }: AccountantDashboardProp
                 <Printer className="mr-2 h-4 w-4" />
                 Печать
               </Button>
+              <Button variant="outline" onClick={handleExportAllToExcel} className="w-full sm:w-auto">
+                <FileSpreadsheet className="mr-2 h-4 w-4" />
+                Экспорт в Excel
+              </Button>
               <Button onClick={handleDownloadReport} className="w-full sm:w-auto">
                 <Download className="mr-2 h-4 w-4" />
-                Скачать
+                Скачать HTML
               </Button>
             </DialogFooter>
           </DialogContent>

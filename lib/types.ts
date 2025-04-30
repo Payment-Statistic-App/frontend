@@ -31,7 +31,6 @@ export interface UserEdit {
 export interface UserLogin {
   login: string
   password: string
-  role: "student" | "observer" | "accountant" | "admin"
 }
 
 export interface Token {

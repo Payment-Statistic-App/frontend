@@ -45,14 +45,37 @@ import {
     Calendar,
     ArrowDown,
     ArrowUp,
+    Upload,
 } from "lucide-react"
 import { formatDateTime, formatPhoneNumber, isValidPhoneNumber } from "@/lib/utils"
 import { Pagination } from "@/components/pagination"
 import { Badge } from "@/components/ui/badge"
 
+// Определяем API_URL прямо здесь
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.energy-cerber.ru"
+
+// Функция для обработки ошибки авторизации
+function handleUnauthorized() {
+    if (typeof document !== "undefined") {
+        document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+        setTimeout(() => {
+            window.location.href = "/"
+        }, 0)
+    }
+}
+
 interface AdminDashboardProps {
     user: UserResponse
     semesters: SemesterResponse[]
+}
+
+function getCookie(name: string) {
+    if (typeof document === "undefined") return null
+
+    const value = `; ${document.cookie}`
+    const parts = value.split(`; ${name}=`)
+    if (parts.length === 2) return parts.pop()?.split(";").shift()
+    return null
 }
 
 export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashboardProps) {
@@ -87,6 +110,10 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
     const [isNewSemesterOpen, setIsNewSemesterOpen] = useState(false)
     const [isEditSemesterOpen, setIsEditSemesterOpen] = useState(false)
     const [isAddToGroupOpen, setIsAddToGroupOpen] = useState(false)
+    const [isUploadStudentsOpen, setIsUploadStudentsOpen] = useState(false)
+    const [uploadedStudents, setUploadedStudents] = useState<UserResponse[]>([])
+    const [isUploading, setIsUploading] = useState(false)
+    const [uploadError, setUploadError] = useState<string | null>(null)
 
     // Выбранные элементы для редактирования
     const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null)
@@ -633,7 +660,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
             case "student":
                 return "Студент"
             case "observer":
-                return "Наблюдатель"
+                return "Директор"
             case "accountant":
                 return "Бухгалтер"
             case "admin":
@@ -671,6 +698,64 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
         setIsInitiatorInfoOpen(true)
     }
 
+    const handleUploadStudents = async (file: File) => {
+        setIsUploading(true)
+        setUploadError(null)
+
+        try {
+            const formData = new FormData()
+            formData.append("file", file)
+
+            const token = getCookie("token")
+
+            const response = await fetch(`${API_URL}/users/load_students`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            })
+
+            if (response.status === 401) {
+                handleUnauthorized()
+                return
+            }
+
+            if (!response.ok) {
+                throw new Error("Failed to upload students")
+            }
+
+            const data = await response.json()
+            setUploadedStudents(data)
+
+            // Refresh users list
+            const updatedUsers = await getAllUsers()
+            const sortedUsers = [...updatedUsers].sort((a, b) => {
+                return b.id.localeCompare(a.id)
+            })
+            setUsers(sortedUsers)
+
+            // Refresh operations list
+            const operationsData = await getOperations()
+            setOperations(operationsData)
+
+            toast({
+                title: "Успешно",
+                description: `Загружено ${data.length} студентов`,
+            })
+        } catch (error) {
+            console.error("Ошибка при загрузке студентов:", error)
+            setUploadError("Не удалось загрузить студентов. Возможно, у файла неверная структура.")
+            toast({
+                title: "Ошибка",
+                description: "Не удалось загрузить студентов",
+                variant: "destructive",
+            })
+        } finally {
+            setIsUploading(false)
+        }
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
@@ -703,7 +788,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                 <SelectContent>
                                     <SelectItem value="all">Все роли</SelectItem>
                                     <SelectItem value="student">Студент</SelectItem>
-                                    <SelectItem value="observer">Наблюдатель</SelectItem>
+                                    <SelectItem value="observer">Директор</SelectItem>
                                     <SelectItem value="accountant">Бухгалтер</SelectItem>
                                     <SelectItem value="admin">Администратор</SelectItem>
                                 </SelectContent>
@@ -713,6 +798,11 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                             <UserPlus className="mr-2 h-4 w-4" />
                             <span className="hidden sm:inline">Добавить пользователя</span>
                             <span className="sm:hidden">Добавить</span>
+                        </Button>
+                        <Button onClick={() => setIsUploadStudentsOpen(true)} className="w-full sm:w-auto ml-2">
+                            <Upload className="mr-2 h-4 w-4" />
+                            <span className="hidden sm:inline">Загрузить из Excel</span>
+                            <span className="sm:hidden">Загрузить</span>
                         </Button>
                     </div>
                     {loading ? (
@@ -1192,7 +1282,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="student">Студент</SelectItem>
-                                    <SelectItem value="observer">Наблюдатель</SelectItem>
+                                    <SelectItem value="observer">Директор</SelectItem>
                                     <SelectItem value="accountant">Бухгалтер</SelectItem>
                                     <SelectItem value="admin">Администратор</SelectItem>
                                 </SelectContent>
@@ -1461,6 +1551,120 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                         <Button type="button" variant="secondary" onClick={() => setIsInitiatorInfoOpen(false)}>
                             Закрыть
                         </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isUploadStudentsOpen} onOpenChange={setIsUploadStudentsOpen}>
+                <DialogContent className="sm:max-w-[600px]">
+                    <DialogHeader>
+                        <DialogTitle>Загрузка студентов из Excel</DialogTitle>
+                        <DialogDescription>
+                            Загрузите файл Excel (.xlsx) со списком студентов для добавления в систему.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {!isUploading && uploadedStudents.length === 0 && !uploadError && (
+                        <div className="py-6">
+                            <div className="flex items-center justify-center w-full">
+                                <label
+                                    htmlFor="dropzone-file"
+                                    className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                                >
+                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <Upload className="w-10 h-10 mb-3 text-gray-400" />
+                                        <p className="mb-2 text-sm text-gray-500">
+                                            <span className="font-semibold">Нажмите для загрузки</span> или перетащите файл
+                                        </p>
+                                        <p className="text-xs text-gray-500">Только файлы XLSX</p>
+                                    </div>
+                                    <input
+                                        id="dropzone-file"
+                                        type="file"
+                                        className="hidden"
+                                        accept=".xlsx"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0]
+                                            if (file) {
+                                                handleUploadStudents(file)
+                                            }
+                                        }}
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                    )}
+
+                    {isUploading && (
+                        <div className="py-6 flex flex-col items-center justify-center">
+                            <Loader2 className="h-8 w-8 animate-spin mb-4" />
+                            <p>Загрузка студентов...</p>
+                        </div>
+                    )}
+
+                    {uploadError && (
+                        <div className="py-6">
+                            <div className="bg-red-50 p-4 rounded-md">
+                                <div className="flex">
+                                    <div className="flex-shrink-0">
+                                        <X className="h-5 w-5 text-red-400" />
+                                    </div>
+                                    <div className="ml-3">
+                                        <h3 className="text-sm font-medium text-red-800">Ошибка загрузки</h3>
+                                        <div className="mt-2 text-sm text-red-700">
+                                            <p>{uploadError}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {!isUploading && uploadedStudents.length > 0 && (
+                        <div className="py-4">
+                            <h3 className="text-lg font-medium mb-4">Загруженные студенты ({uploadedStudents.length}):</h3>
+                            <div className="overflow-y-auto max-h-[300px] border rounded-md">
+                                <table className="w-full text-sm">
+                                    <thead className="bg-muted">
+                                    <tr>
+                                        <th className="p-2 text-left">ФИО</th>
+                                        <th className="p-2 text-left">Логин</th>
+                                        <th className="p-2 text-left">Телефон</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody className="divide-y">
+                                    {uploadedStudents.map((student) => (
+                                        <tr key={student.id}>
+                                            <td className="p-2">
+                                                {student.surname} {student.name} {student.patronymic}
+                                            </td>
+                                            <td className="p-2">{student.login}</td>
+                                            <td className="p-2">{student.phone}</td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {!isUploading && uploadedStudents.length === 0 && !uploadError && (
+                        <div className="text-center text-muted-foreground py-2">Выберите файл для загрузки</div>
+                    )}
+
+                    <DialogFooter>
+                        {(uploadedStudents.length > 0 || uploadError) && (
+                            <Button
+                                onClick={() => {
+                                    setUploadedStudents([])
+                                    setUploadError(null)
+                                }}
+                                variant="outline"
+                            >
+                                Загрузить другой файл
+                            </Button>
+                        )}
+                        <Button onClick={() => setIsUploadStudentsOpen(false)}>Закрыть</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
