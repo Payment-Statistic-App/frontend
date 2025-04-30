@@ -40,12 +40,13 @@ export function ReceiptDialog({ open, onOpenChange, transaction, user, semester 
             body {
               font-family: Arial, sans-serif;
               padding: 20px;
+              margin: 0;
+              color: #000;
             }
             .receipt {
               max-width: 800px;
               margin: 0 auto;
               padding: 20px;
-              border: 1px solid #ccc;
             }
             .header {
               text-align: center;
@@ -54,14 +55,17 @@ export function ReceiptDialog({ open, onOpenChange, transaction, user, semester 
             .title {
               font-size: 24px;
               font-weight: bold;
+              margin-bottom: 5px;
+            }
+            .subtitle {
+              margin-bottom: 5px;
             }
             .content {
               margin-bottom: 20px;
             }
-            .footer {
-              margin-top: 40px;
-              display: flex;
-              justify-content: space-between;
+            .content p {
+              margin-bottom: 15px;
+              line-height: 1.5;
             }
             table {
               width: 100%;
@@ -77,6 +81,24 @@ export function ReceiptDialog({ open, onOpenChange, transaction, user, semester 
             }
             th {
               background-color: #f2f2f2;
+              width: 40%;
+            }
+            .footer {
+              margin-top: 40px;
+              display: flex;
+              justify-content: space-between;
+            }
+            .date {
+              position: absolute;
+              top: 20px;
+              left: 20px;
+              font-size: 12px;
+            }
+            .page-number {
+              position: absolute;
+              bottom: 20px;
+              right: 20px;
+              font-size: 12px;
             }
           </style>
         </head>
@@ -104,12 +126,13 @@ export function ReceiptDialog({ open, onOpenChange, transaction, user, semester 
             body {
               font-family: Arial, sans-serif;
               padding: 20px;
+              margin: 0;
+              color: #000;
             }
             .receipt {
               max-width: 800px;
               margin: 0 auto;
               padding: 20px;
-              border: 1px solid #ccc;
             }
             .header {
               text-align: center;
@@ -118,14 +141,17 @@ export function ReceiptDialog({ open, onOpenChange, transaction, user, semester 
             .title {
               font-size: 24px;
               font-weight: bold;
+              margin-bottom: 5px;
+            }
+            .subtitle {
+              margin-bottom: 5px;
             }
             .content {
               margin-bottom: 20px;
             }
-            .footer {
-              margin-top: 40px;
-              display: flex;
-              justify-content: space-between;
+            .content p {
+              margin-bottom: 15px;
+              line-height: 1.5;
             }
             table {
               width: 100%;
@@ -141,6 +167,24 @@ export function ReceiptDialog({ open, onOpenChange, transaction, user, semester 
             }
             th {
               background-color: #f2f2f2;
+              width: 40%;
+            }
+            .footer {
+              margin-top: 40px;
+              display: flex;
+              justify-content: space-between;
+            }
+            .date {
+              position: absolute;
+              top: 20px;
+              left: 20px;
+              font-size: 12px;
+            }
+            .page-number {
+              position: absolute;
+              bottom: 20px;
+              right: 20px;
+              font-size: 12px;
             }
           </style>
         </head>
@@ -161,6 +205,9 @@ export function ReceiptDialog({ open, onOpenChange, transaction, user, semester 
     URL.revokeObjectURL(url)
   }
 
+  // Форматируем ID транзакции для отображения в справке
+  const formattedTransactionId = transaction.id.substring(0, 8)
+
   return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[700px]">
@@ -169,15 +216,22 @@ export function ReceiptDialog({ open, onOpenChange, transaction, user, semester 
             <DialogDescription>Справка об оплате за {semester?.name || "семестр"}</DialogDescription>
           </DialogHeader>
 
-          <div ref={receiptRef} className="receipt overflow-auto">
-            <div className="header">
-              <div className="title">СПРАВКА ОБ ОПЛАТЕ</div>
-              <div>№ {transaction.id.substring(0, 8)}</div>
-              <div>от {formatDate(transaction.created_at)}</div>
+          <div ref={receiptRef} className="receipt bg-white p-6 overflow-auto" style={{ position: "relative" }}>
+            <div
+                className="date text-xs text-muted-foreground"
+                style={{ position: "absolute", top: "20px", left: "20px" }}
+            >
+              {new Date().toLocaleDateString()} {new Date().toLocaleTimeString().slice(0, 5)}
+            </div>
+
+            <div className="header text-center mb-6">
+              <div className="title uppercase font-bold text-2xl mb-1">СПРАВКА ОБ ОПЛАТЕ</div>
+              <div className="subtitle mb-1">№ {formattedTransactionId}</div>
+              <div className="subtitle">от {formatDate(transaction.created_at)}</div>
             </div>
 
             <div className="content">
-              <p>
+              <p className="mb-4 leading-relaxed">
                 Настоящая справка подтверждает, что студент{" "}
                 <strong>
                   {user.surname} {user.name} {user.patronymic}
@@ -186,49 +240,50 @@ export function ReceiptDialog({ open, onOpenChange, transaction, user, semester 
                 <strong>{semester?.name || "семестр"}</strong>.
               </p>
 
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                  <tr>
-                    <th>Параметр</th>
-                    <th>Значение</th>
-                  </tr>
-                  </thead>
+              <div className="w-full overflow-hidden border border-gray-200 rounded-sm">
+                <table className="w-full border-collapse">
                   <tbody>
                   <tr>
-                    <td>ФИО студента</td>
-                    <td>
+                    <th className="border border-gray-200 p-3 bg-gray-50 w-2/5 text-left">ФИО студента</th>
+                    <td className="border border-gray-200 p-3">
                       {user.surname} {user.name} {user.patronymic}
                     </td>
                   </tr>
                   <tr>
-                    <td>Семестр</td>
-                    <td>{semester?.name || "Не указан"}</td>
+                    <th className="border border-gray-200 p-3 bg-gray-50 w-2/5 text-left">Семестр</th>
+                    <td className="border border-gray-200 p-3">{semester?.name || "Не указан"}</td>
                   </tr>
                   <tr>
-                    <td>Сумма оплаты</td>
-                    <td>{transaction.amount} ₽</td>
+                    <th className="border border-gray-200 p-3 bg-gray-50 w-2/5 text-left">Сумма оплаты</th>
+                    <td className="border border-gray-200 p-3">{transaction.amount} ₽</td>
                   </tr>
                   <tr>
-                    <td>Дата оплаты</td>
-                    <td>{formatDate(transaction.created_at)}</td>
+                    <th className="border border-gray-200 p-3 bg-gray-50 w-2/5 text-left">Дата оплаты</th>
+                    <td className="border border-gray-200 p-3">{formatDate(transaction.created_at)}</td>
                   </tr>
                   <tr>
-                    <td>Номер транзакции</td>
-                    <td>{transaction.id}</td>
+                    <th className="border border-gray-200 p-3 bg-gray-50 w-2/5 text-left">Номер транзакции</th>
+                    <td className="border border-gray-200 p-3">{transaction.id}</td>
                   </tr>
                   </tbody>
                 </table>
               </div>
             </div>
 
-            <div className="footer">
+            <div className="footer mt-8 flex justify-between">
               <div>
                 <p>Подпись уполномоченного лица: _________________</p>
               </div>
               <div>
                 <p>М.П.</p>
               </div>
+            </div>
+
+            <div
+                className="page-number text-xs text-muted-foreground"
+                style={{ position: "absolute", bottom: "20px", right: "20px" }}
+            >
+              1/1
             </div>
           </div>
 
