@@ -799,7 +799,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                             <span className="hidden sm:inline">Добавить пользователя</span>
                             <span className="sm:hidden">Добавить</span>
                         </Button>
-                        <Button onClick={() => setIsUploadStudentsOpen(true)} className="w-full sm:w-auto ml-2">
+                        <Button onClick={() => setIsUploadStudentsOpen(true)} className="w-full sm:w-auto">
                             <Upload className="mr-2 h-4 w-4" />
                             <span className="hidden sm:inline">Загрузить из Excel</span>
                             <span className="sm:hidden">Загрузить</span>
