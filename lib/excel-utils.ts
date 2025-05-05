@@ -91,16 +91,16 @@ export function formatSemesterStatsForExcel(students: any[], semesters: any[]) {
 
   return semesters.map((semester) => {
     const paidCount = students.filter((student) =>
-      student.transactions.some((t: any) => t.semester_id === semester.id),
+        student.transactions.some((t: any) => t.semester_id === semester.id),
     ).length
 
     const totalAmount = students.reduce(
-      (sum, student) =>
-        sum +
-        student.transactions
-          .filter((t: any) => t.semester_id === semester.id)
-          .reduce((s: number, t: any) => s + t.amount, 0),
-      0,
+        (sum, student) =>
+            sum +
+            student.transactions
+                .filter((t: any) => t.semester_id === semester.id)
+                .reduce((s: number, t: any) => s + t.amount, 0),
+        0,
     )
 
     return {
@@ -111,4 +111,81 @@ export function formatSemesterStatsForExcel(students: any[], semesters: any[]) {
       "Общая сумма": `${totalAmount} ₽`,
     }
   })
+}
+
+// Функция для создания шаблона Excel для загрузки студентов
+export function createStudentTemplateExcel() {
+  try {
+    // Создаем пример данных для шаблона
+    const templateData = [
+      {
+        Фамилия: "Иванов",
+        Имя: "Иван",
+        Отчество: "Иванович",
+        "Номер телефона": "89001234567",
+        Логин: "ivanov_ivan",
+        Пароль: "password123",
+      },
+      {
+        Фамилия: "Петров",
+        Имя: "Петр",
+        Отчество: "Петрович",
+        "Номер телефона": "89002345678",
+        Логин: "petrov_petr",
+        Пароль: "securepass",
+      },
+      {
+        Фамилия: "Сидоров",
+        Имя: "Сидор",
+        Отчество: "Сидорович",
+        "Номер телефона": "89003456789",
+        Логин: "sidorov_s",
+        Пароль: "pass12345",
+      },
+      {
+        Фамилия: "Смирнова",
+        Имя: "Анна",
+        Отчество: "Сергеевна",
+        "Номер телефона": "89004567890",
+        Логин: "smirnova_a",
+        Пароль: "annapass",
+      },
+    ]
+
+    // Создаем новую книгу Excel
+    const workbook = XLSX.utils.book_new()
+
+    // Преобразуем данные в формат для Excel
+    const worksheet = XLSX.utils.json_to_sheet(templateData)
+
+    // Добавляем лист в книгу
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Студенты")
+
+    // Создаем бинарные данные в формате xlsx
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" })
+
+    // Создаем Blob из бинарных данных
+    const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })
+
+    // Создаем URL для Blob
+    const url = URL.createObjectURL(blob)
+
+    // Создаем ссылку для скачивания
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `Шаблон_для_загрузки_студентов.xlsx`
+
+    // Добавляем ссылку в DOM, кликаем по ней и удаляем
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+
+    // Освобождаем URL
+    URL.revokeObjectURL(url)
+
+    return true
+  } catch (error) {
+    console.error("Ошибка при создании шаблона Excel:", error)
+    return false
+  }
 }

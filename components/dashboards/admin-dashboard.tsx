@@ -50,6 +50,7 @@ import {
 import { formatDateTime, formatPhoneNumber, isValidPhoneNumber } from "@/lib/utils"
 import { Pagination } from "@/components/pagination"
 import { Badge } from "@/components/ui/badge"
+import { createStudentTemplateExcel } from "@/lib/excel-utils"
 
 // Определяем API_URL прямо здесь
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.energy-cerber.ru"
@@ -97,6 +98,7 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
     const [passwordError, setPasswordError] = useState("")
     const [isInitiatorInfoOpen, setIsInitiatorInfoOpen] = useState(false)
     const [selectedInitiator, setSelectedInitiator] = useState<OperationResponse["initiator"] | null>(null)
+    const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false)
     const { toast } = useToast()
 
     // Количество записей на странице
@@ -756,6 +758,32 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
         }
     }
 
+    // Функция для скачивания шаблона Excel
+    const handleDownloadTemplate = () => {
+        try {
+            const success = createStudentTemplateExcel()
+            if (success) {
+                toast({
+                    title: "Успешно",
+                    description: "Шаблон Excel успешно скачан",
+                })
+            } else {
+                toast({
+                    title: "Ошибка",
+                    description: "Не удалось скачать шаблон Excel",
+                    variant: "destructive",
+                })
+            }
+        } catch (error) {
+            console.error("Ошибка при скачивании шаблона Excel:", error)
+            toast({
+                title: "Ошибка",
+                description: "Не удалось скачать шаблон Excel",
+                variant: "destructive",
+            })
+        }
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
@@ -794,16 +822,23 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                                 </SelectContent>
                             </Select>
                         </div>
-                        <Button onClick={() => setIsNewUserOpen(true)} className="w-full sm:w-auto">
-                            <UserPlus className="mr-2 h-4 w-4" />
-                            <span className="hidden sm:inline">Добавить пользователя</span>
-                            <span className="sm:hidden">Добавить</span>
-                        </Button>
-                        <Button onClick={() => setIsUploadStudentsOpen(true)} className="w-full sm:w-auto">
-                            <Upload className="mr-2 h-4 w-4" />
-                            <span className="hidden sm:inline">Загрузить из Excel</span>
-                            <span className="sm:hidden">Загрузить</span>
-                        </Button>
+                        <div className="flex flex-wrap gap-2">
+                            <Button onClick={() => setIsNewUserOpen(true)} className="w-full sm:w-auto">
+                                <UserPlus className="mr-2 h-4 w-4" />
+                                <span className="hidden sm:inline">Добавить пользователя</span>
+                                <span className="sm:hidden">Добавить</span>
+                            </Button>
+                            <Button onClick={() => setIsUploadStudentsOpen(true)} className="w-full sm:w-auto">
+                                <Upload className="mr-2 h-4 w-4" />
+                                <span className="hidden sm:inline">Загрузить из Excel</span>
+                                <span className="sm:hidden">Загрузить</span>
+                            </Button>
+                            <Button onClick={() => setIsTemplateDialogOpen(true)} variant="outline" className="w-full sm:w-auto">
+                                <FileText className="mr-2 h-4 w-4" />
+                                <span className="hidden sm:inline">Показать шаблон Excel</span>
+                                <span className="sm:hidden">Шаблон</span>
+                            </Button>
+                        </div>
                     </div>
                     {loading ? (
                         <div className="flex items-center justify-center">
@@ -813,13 +848,13 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                         <div className="overflow-x-auto">
                             <div className="rounded-md border min-w-[800px]">
                                 <table className="w-full text-sm">
-                                    <thead className="[&amp;:not([align=left])]:text-left">
+                                    <thead>
                                     <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                        <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">ФИО</th>
-                                        <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Телефон</th>
-                                        <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Логин</th>
-                                        <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Роль</th>
-                                        <th className="h-12 px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">Действия</th>
+                                        <th className="h-12 px-4 font-medium text-left">ФИО</th>
+                                        <th className="h-12 px-4 font-medium text-left">Телефон</th>
+                                        <th className="h-12 px-4 font-medium text-left">Логин</th>
+                                        <th className="h-12 px-4 font-medium text-left">Роль</th>
+                                        <th className="h-12 px-4 font-medium text-left">Действия</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -916,17 +951,11 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                         <div className="overflow-x-auto">
                             <div className="rounded-md border min-w-[600px]">
                                 <table className="w-full text-sm">
-                                    <thead className="[&amp;:not([align=left])]:text-left">
+                                    <thead>
                                     <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                        <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">
-                                            Название
-                                        </th>
-                                        <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">
-                                            Студенты
-                                        </th>
-                                        <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground pl-7">
-                                            Действия
-                                        </th>
+                                        <th className="h-12 text-left px-4 font-medium">Название</th>
+                                        <th className="h-12 text-left px-4 font-medium">Студенты</th>
+                                        <th className="h-12 text-left px-4 font-medium pl-7">Действия</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -1027,14 +1056,10 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                         <div className="overflow-x-auto">
                             <div className="rounded-md border min-w-[600px]">
                                 <table className="w-full text-sm">
-                                    <thead className="[&amp;:not([align=left])]:text-left">
+                                    <thead>
                                     <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                        <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground">
-                                            Название
-                                        </th>
-                                        <th className="h-12 text-left px-4 font-medium [&amp;:[data-state=selected]]:text-foreground pl-7">
-                                            Действия
-                                        </th>
+                                        <th className="h-12 text-left px-4 font-medium">Название</th>
+                                        <th className="h-12 text-left px-4 font-medium pl-7">Действия</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -1138,16 +1163,12 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                         <div className="overflow-x-auto">
                             <div className="rounded-md border min-w-[800px]">
                                 <table className="w-full text-sm">
-                                    <thead className="[&amp;:not([align=left])]:text-left">
+                                    <thead>
                                     <tr className="m-0 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                        <th className="h-12 px-4 font-medium [&amp;[data-state=selected]]:text-foreground">
-                                            Дата и время
-                                        </th>
-                                        <th className="h-12 px-4 font-medium [&amp;[data-state=selected]]:text-foreground">Тип</th>
-                                        <th className="h-12 px-4 font-medium [&amp;[data-state=selected]]:text-foreground">
-                                            Комментарий
-                                        </th>
-                                        <th className="h-12 px-4 font-medium [&amp;[data-state=selected]]:text-foreground">Инициатор</th>
+                                        <th className="h-12 px-4 font-medium text-left">Дата и время</th>
+                                        <th className="h-12 px-4 font-medium text-left">Тип</th>
+                                        <th className="h-12 px-4 font-medium text-left">Комментарий</th>
+                                        <th className="h-12 px-4 font-medium text-left">Инициатор</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -1665,6 +1686,80 @@ export function AdminDashboard({ user, semesters: initialSemesters }: AdminDashb
                             </Button>
                         )}
                         <Button onClick={() => setIsUploadStudentsOpen(false)}>Закрыть</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Диалог для просмотра шаблона Excel */}
+            <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
+                <DialogContent className="sm:max-w-[800px]">
+                    <DialogHeader>
+                        <DialogTitle>Шаблон Excel для загрузки студентов</DialogTitle>
+                        <DialogDescription>Структура файла Excel для загрузки студентов в систему</DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <div className="overflow-x-auto">
+                            <table className="w-full border-collapse border border-gray-300">
+                                <thead className="bg-gray-100">
+                                <tr>
+                                    <th className="border border-gray-300 p-2 text-center">Фамилия</th>
+                                    <th className="border border-gray-300 p-2 text-center">Имя</th>
+                                    <th className="border border-gray-300 p-2 text-center">Отчество</th>
+                                    <th className="border border-gray-300 p-2 text-center">Номер телефона</th>
+                                    <th className="border border-gray-300 p-2 text-center">Логин</th>
+                                    <th className="border border-gray-300 p-2 text-center">Пароль</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td className="border border-gray-300 p-2">Иванов</td>
+                                    <td className="border border-gray-300 p-2">Иван</td>
+                                    <td className="border border-gray-300 p-2">Иванович</td>
+                                    <td className="border border-gray-300 p-2">89001234567</td>
+                                    <td className="border border-gray-300 p-2">ivanov_ivan</td>
+                                    <td className="border border-gray-300 p-2">password123</td>
+                                </tr>
+                                <tr>
+                                    <td className="border border-gray-300 p-2">Петров</td>
+                                    <td className="border border-gray-300 p-2">Петр</td>
+                                    <td className="border border-gray-300 p-2">Петрович</td>
+                                    <td className="border border-gray-300 p-2">89002345678</td>
+                                    <td className="border border-gray-300 p-2">petrov_petr</td>
+                                    <td className="border border-gray-300 p-2">securepass</td>
+                                </tr>
+                                <tr>
+                                    <td className="border border-gray-300 p-2">Сидоров</td>
+                                    <td className="border border-gray-300 p-2">Сидор</td>
+                                    <td className="border border-gray-300 p-2">Сидорович</td>
+                                    <td className="border border-gray-300 p-2">89003456789</td>
+                                    <td className="border border-gray-300 p-2">sidorov_s</td>
+                                    <td className="border border-gray-300 p-2">pass12345</td>
+                                </tr>
+                                <tr>
+                                    <td className="border border-gray-300 p-2">Смирнова</td>
+                                    <td className="border border-gray-300 p-2">Анна</td>
+                                    <td className="border border-gray-300 p-2">Сергеевна</td>
+                                    <td className="border border-gray-300 p-2">89004567890</td>
+                                    <td className="border border-gray-300 p-2">smirnova_a</td>
+                                    <td className="border border-gray-300 p-2">annapass</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="mt-4 text-sm text-muted-foreground">
+                            <p>Примечания:</p>
+                            <ul className="list-disc pl-5 space-y-1 mt-2">
+                                <li>Все поля обязательны для заполнения</li>
+                                <li>Пароль должен содержать минимум 8 символов</li>
+                                <li>Номер телефона должен быть в формате 8XXXXXXXXXX</li>
+                                <li>Логин должен быть уникальным</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsTemplateDialogOpen(false)}>
+                            Закрыть
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
