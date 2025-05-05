@@ -5,14 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import type { UserResponse } from "@/lib/types"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { LogOut, Menu, User, X } from "lucide-react"
 
 interface DashboardHeaderProps {
@@ -68,8 +61,6 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Мой аккаунт</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Выйти</span>
